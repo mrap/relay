@@ -19,6 +19,7 @@
     "mocha": "~1.18.2",
     "chai": "~1.9.1",
     "mongodb": "~1.4.0",
-    "mocha-mongoose": "~1.0.1"
+    "mocha-mongoose": "~1.0.1",
+    "redis": "~0.10.1"
   }
 }
