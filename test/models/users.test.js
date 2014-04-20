@@ -1,20 +1,6 @@
 var should = require('chai').should()
-
-var User
-/*** Setup ***/
-beforeEach(function(done){
-  process.env.NODE_ENV = 'test'
-  var app = require('../../app')
-  User = require('../../model/user')
-  done()
-})
-
-/*** Tear Down ***/
-var mongoose = require('mongoose')
-afterEach(function(done){
-  // Clean DB
-  mongoose.connection.close(done())
-})
+var helper = require('../test_helper')
+var User = require('../../model/user')
 
 describe("User Model", function(){
   describe("creating a user", function(){
