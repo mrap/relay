@@ -6,6 +6,7 @@ if (env == 'test') {
   // Clean models and schemas
   mongoose.models = {}
   mongoose.modelSchemas = {}
+  // mongoose.createConnection('mongodb://localhost/relay_test')
   mongoose.connect('mongodb://localhost/relay_test')
 }
 

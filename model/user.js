@@ -11,3 +11,10 @@ exports.createUser = function(attrs, callback){
     callback(err, newUser)
   })
 }
+
+exports.userExists = function(id, callback){
+  if (!id) return callback(new Error("user_id required"), false);
+  User.findById(id, function(err, user){
+    callback(err, user != null);
+  });
+}

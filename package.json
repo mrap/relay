@@ -17,6 +17,8 @@
     "node-compass": "0.2.3",
     "mongoose": "~3.8.8",
     "mocha": "~1.18.2",
-    "chai": "~1.9.1"
+    "chai": "~1.9.1",
+    "mongodb": "~1.4.0",
+    "mocha-mongoose": "~1.0.1"
   }
 }

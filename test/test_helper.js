@@ -2,15 +2,9 @@
 /*** Global Suite Setup and Tear Down ***/
 
 /*** Setup ***/
-beforeEach(function(done){
+beforeEach(function(){
   process.env.NODE_ENV = 'test'
-  var app = require('../app')
-  done()
+  require('mocha-mongoose')('mongodb://localhost/relay_test');
+  require('../app')
 })
 
-/*** Tear Down ***/
-var mongoose = require('mongoose')
-afterEach(function(done){
-  // Clean DB
-  mongoose.connection.close(done())
-})
