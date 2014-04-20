@@ -1,18 +1,23 @@
-var mongoose = require('mongoose')
+var mongoose = require('mongoose'),
+    Schema   = mongoose.Schema;
 var User = require('./user')
-var postSchema = mongoose.Schema({
+var postSchema = Schema({
+  _author: {type: Schema.Types.ObjectId, ref: 'User', required: true}
 });
 var Post = mongoose.model('Post', postSchema);
 
-exports.createPost = function(user_id, attrs, callback){
-  if (!user_id) return callback(new Error("user_id required to create a post"), null);
-  User.userExists(user_id, function(err, exists){
-    if (!exists) return callback(err, null)
-    var newPost = new Post(attrs);
-    // Save post to Mongo
-    newPost.save(function(err, res){
-      if (err) return callback(err, res)
-      callback(err, newPost)
+exports.createPost = function(attrs, callback){
+  var newPost = new Post(attrs);
+  newPost.save(function(err){
+    if (err) throw err;
+    User.findById(newPost._author, 'posts' , function(err, res){
+      if (err) throw err;
+      var author = res;
+      author.posts.push(newPost._id);
+      author.save(function(err){
+        if (err) throw err;
+        callback(null, newPost)
+      });
     })
   })
 }

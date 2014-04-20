@@ -12,9 +12,12 @@ describe("User Model", function(){
       })
     })
 
-    it("should have a mongo id", function(done){
+    it("should have a mongo id", function(){
       user.id.should.exist
-      done()
+    })
+
+    it("should have no posts", function(){
+      user.posts.should.be.empty
     })
   })
 })
