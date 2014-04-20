@@ -5,6 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// Configure Environment
+var env = process.env.NODE_ENV || 'development';
+var db = require('./model/db.js');
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
