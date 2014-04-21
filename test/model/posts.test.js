@@ -13,11 +13,8 @@ describe("Post Model", function(){
     beforeEach(function(done){
       UserFixture.createUserWithConnections(3, 10, null, function(err, res){
         user = res;
-        Post.createPost({_author: user._id}, function(err, res){
-          expect(err).not.to.exist
-          post = res
-          done()
-        })
+        post = Post.createPost({_author: user._id});
+        post.on("created", done);
       })
     })
 

@@ -10,7 +10,7 @@ var postSchema = Schema({
 // Note: Temp const.  This will change later in the project.
 var DEFAULT_POST_SCORE = 10;
 
-postSchema.methods.addToFeeds = function(callback){
+postSchema.methods.updateConnectedFeeds = function(){
   var post = this;
   /*** Get author's connections ***/
   post.author.getConnections(function(err, connections){
@@ -25,35 +25,46 @@ postSchema.methods.addToFeeds = function(callback){
     }
     transaction.exec(function(err, replies){
       if (err) throw err;
-      callback(null, null);
+      post.emit("updatedConnectedFeeds");
+    });
+  });
+};
+
+postSchema.methods.assignAuthor = function(){
+  var post = this;
+  /*** Add to Author's Posts ***/
+  User.findById(post._author, 'posts' , function(err, res){
+    if (err) throw err;
+    var author = res;
+    author.posts.push(post._id);
+    author.save(function(err){
+      if (err) throw err;
+      post.author = new User(author);
+      post.emit("assignedAuthor", post.author);
     });
   });
 };
 
 var Post = mongoose.model('Post', postSchema);
 
-Post.createPost = function(attrs, callback){
+Post.createPost = function(attrs){
   /*** Save Post ***/
   var newPost = new Post(attrs);
-  newPost.save(function(err){
-    if (err) throw err;
-    
-    /*** Add to Author's Posts ***/
-    User.findById(newPost._author, 'posts' , function(err, res){
-      if (err) throw err;
-      var author = res;
-      author.posts.push(newPost._id);
-      author.save(function(err){
-        if (err) throw err;
-        newPost.author = new User(author);
-
-        /*** Add to Author's connection's feeds ***/
-        newPost.addToFeeds(function(err, res){
-          callback(null, newPost)
-        });
-      });
-    })
+  newPost.once("new", newPost.assignAuthor);
+  newPost.once("assignedAuthor", newPost.updateConnectedFeeds);
+  newPost.once("updatedConnectedFeeds", function(){
+    newPost.emit("created");
+  });
+  newPost.on("updatedConnectedFeeds", function(){
+    newPost.emit("saved");
   })
-}
+
+  newPost.save(function(err){ 
+    if (err) throw err; 
+    newPost.emit("new");
+  });
+
+  return newPost;
+};
 
 module.exports = Post;

@@ -15,17 +15,19 @@ var Fixture = {
   createPost: function(attrs, callback){
     attrs = this.ensureRequiredAttrs(attrs)
     // If _author present create a post
+    var post = new Post();
     if (typeof attrs._author !== 'undefined') {
-      Post.createPost(attrs, function(err, res){
-        if (err) throw err;
-        return callback(null, res);
+      var post = Post.createPost(attrs);
+      post.once("created", function(){
+        callback(null, post);
       });
     } else {
-      UserFixture.createUser(null, function(err, user){
+      var user = UserFixture.createUser(null);
+      user.on("created", function(){
         attrs._author = user._id;
-        Post.createPost(attrs, function(err, res){
-          if (err) throw err;
-          return callback(null, res);
+        var post = Post.createPost(attrs);
+        post.once("created", function(){
+          callback(null, post);
         });
       });
     }

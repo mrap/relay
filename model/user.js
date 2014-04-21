@@ -29,19 +29,20 @@ userSchema.methods.keyID = function(attr) {
  * @param other    user     cannot be self
  * @param callback callback returns distance
  */
-userSchema.methods.connectWithUser = function(distance, other, callback){
+userSchema.methods.connectWithUser = function(distance, other){
   var user = this;
   client.multi()
     .zadd(user.keyID("connections"), distance, other._id)
     .zadd(other.keyID("connections"), distance, user._id)
     .exec(function(err, replies){
       if (err) throw err;
-      callback(null, new Connection(user._id, other._id, distance));
+      user.emit("connected", new Connection(user._id, other._id, distance));
     });
 };
 
 userSchema.methods.getFeedPostIds = function(callback){
-  var args = [this.keyID("feed"), 0, -1, 'WITHSCORES'];
+  var user = this;
+  var args = [user.keyID("feed"), 0, -1, 'WITHSCORES'];
   client.zrange(args, function(err, res){
     if (err) throw err;
     callback(null, res);
@@ -54,7 +55,7 @@ userSchema.methods.getFeedPostIds = function(callback){
 userSchema.methods.getConnectionsCount = function(callback){
   client.zcard(this.keyID("connections"), function(err, count){
     if (err) throw err;
-    callback(null, count);
+    callback(err, count);
   });
 };
 
@@ -67,7 +68,7 @@ userSchema.methods.getConnections = function(callback){
   client.zrange(args, function(err, res){
     if (err) throw err;
     var connections = new Array();
-    var length = res.length
+    var length = res.length;
     var otherID = null;
     var distance = null;
     for(var i = 0; i < length; i += 2){
@@ -75,7 +76,7 @@ userSchema.methods.getConnections = function(callback){
       distance = res[i+1];
       connections.push(new Connection(user._id, otherID, distance));
     }
-    callback(err, connections);
+    callback(null, connections);
   });
 };
 
@@ -90,12 +91,13 @@ Array.prototype.containsUser = function(user){
   return false;
 };
 
-User.createUser = function(attrs, callback){
-  var newUser = new User(attrs)
-  newUser.save(function(err, res){
-    if (err) return callback(err, res)
-    callback(err, newUser)
-  })
+User.createUser = function(attrs){
+  var newUser = new User(attrs);
+  newUser.save(function(err){
+    if (err) throw err;
+    newUser.emit("created");
+  });
+  return newUser;
 }
 
 User.connectUsers = function(users, distance, callback){
@@ -103,7 +105,10 @@ User.connectUsers = function(users, distance, callback){
     return callback(new Error("Needs two users to connect"), null);
   var user1 = users[0];
   var user2 = users[1];
-  user1.connectWithUser(distance, user2, callback);
+  user1.once("connected", function(newConnection){
+    callback(null, newConnection);
+  });
+  user1.connectWithUser(distance, user2);
 };
 
 User.getConnectedUsers = function(user, callback){
@@ -112,7 +117,7 @@ User.getConnectedUsers = function(user, callback){
     // Extract an array of the connected user's ids
     var ids  = new Array();
     for(var i = 0; i < connections.length; i++)
-      ids.push(connections[i].target);
+    ids.push(connections[i].target);
     model.find({'_id': {'$in': ids}}, function(err, res){
       if (err) throw err;
       callback(null, res);

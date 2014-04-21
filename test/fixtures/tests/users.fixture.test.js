@@ -26,6 +26,7 @@ describe("UserFixture", function(){
     });
 
     it("should be successful", function(){
+      users[0]._id.toString().should.not.eq(users[1]._id.toString());
       users.length.should.eq(3);
     });
   });

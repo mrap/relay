@@ -10,10 +10,8 @@ describe("User Model", function(){
     var user
     var attrs = {};
     beforeEach(function(done){
-      UserFixture.createUser(attrs, function(err, res){
-        user = res;
-        done();
-      });
+      user = UserFixture.createUser(attrs);
+      user.once("created", done);
     })
 
     it("should have a mongo id", function(){
@@ -32,10 +30,10 @@ describe("User Model", function(){
     var result = null;
     var testUsersConnected = function(){
       it("should create a connection for both users", function(done){
-        user1.getConnectionsCount(function(err, res){
-          expect(res).to.eq(1);
-          user2.getConnectionsCount(function(err, res){
-            expect(res).to.eq(1);
+        user1.getConnectionsCount(function(err, count){
+          expect(count).to.eq(1);
+          user2.getConnectionsCount(function(err, count){
+            expect(count).to.eq(1);
             done();
           });
         });
@@ -67,10 +65,10 @@ describe("User Model", function(){
         UserFixture.createUsers(2, null, function(err, users){
           user1 = users[0];
           user2 = users[1];
-          user1.connectWithUser(dist, user2, function(err, res){
+          User.connectUsers([user1, user2], dist, function(err,res){
             result = res;
             done();
-          });
+          })
         });
       });
       testUsersConnected();
@@ -101,11 +99,10 @@ describe("User Model", function(){
       describe("User#getConnectedUsers", function(){
         var user3 = null;
         beforeEach(function(done){
-          UserFixture.createUser(null, function(err, user){
-            user3 = user;
-            user1.connectWithUser(dist, user3, function(err, res){
-              done();
-            });
+          user3 = UserFixture.createUser(null);
+          user3.once("created", function(){
+            user1.once("connected", function() {done(); });
+            user1.connectWithUser(dist, user3);
           });
         });
 
