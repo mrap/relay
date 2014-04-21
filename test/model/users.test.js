@@ -24,34 +24,52 @@ describe("User Model", function(){
     })
   })
 
-  describe("#connectWithUser", function(){
+  describe("connecting users", function(){
     var user1 = null;
     var user2 = null;
     var dist = 10;
     var result = null;
-    beforeEach(function(done){
-      UserFixture.createUsers(2, null, function(err, users){
-        user1 = users[0];
-        user2 = users[1];
-        user1.connectWithUser(dist, user2, function(err, res){
-          result = res;
-          done();
-        });
-      });
-    })
-
-    it("should create a connection for both users", function(done){
-      user1.getConnectionsCount(function(err, res){
-        expect(res).to.eq(1);
-        user2.getConnectionsCount(function(err, res){
+    var testUsersConnected = function(){
+      it("should create a connection for both users", function(done){
+        user1.getConnectionsCount(function(err, res){
           expect(res).to.eq(1);
-          done();
+          user2.getConnectionsCount(function(err, res){
+            expect(res).to.eq(1);
+            done();
+          });
         });
       });
+
+      it("should return the connection distance", function(){
+        result.should.eq(dist);
+      });
+    };
+    describe("User#connectUsers", function(){
+      beforeEach(function(done){
+        UserFixture.createUsers(2, null, function(err, users){
+          user1 = users[0];
+          user2 = users[1];
+          User.connectUsers([user1, user2], dist, function(err, res){
+            result = res;
+            done();
+          });
+        });
+      })
+      testUsersConnected();
     });
 
-    it("should return the connection distance", function(){
-      result.should.eq(dist);
+    describe("#connectUsers", function(){
+      beforeEach(function(done){
+        UserFixture.createUsers(2, null, function(err, users){
+          user1 = users[0];
+          user2 = users[1];
+          user1.connectWithUser(dist, user2, function(err, res){
+            result = res;
+            done();
+          });
+        });
+      })
+      testUsersConnected();
     });
   })
 })

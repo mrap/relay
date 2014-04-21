@@ -63,17 +63,9 @@ User.createUser = function(attrs, callback){
 User.connectUsers = function(users, distance, callback){
   if (!(users instanceof Array) || users.length != 2)
     return callback(new Error("Needs two users to connect"), null);
-  var id1 = users[0]._id;
-  var id2 = users[1]._id;
-  var key1 = key.keyIDAttribute("user", id1, "connections");
-  var key2 = key.keyIDAttribute("user", id2, "connections");
-  client.multi()
-    .zadd(key1, distance, id2)
-    .zadd(key2, distance, id1)
-    .exec(function(err, replies){
-      if (err) throw err;
-      callback(null, distance);
-    });
+  var user1 = users[0];
+  var user2 = users[1];
+  user1.connectWithUser(distance, user2, callback);
 };
 
 module.exports = User;
