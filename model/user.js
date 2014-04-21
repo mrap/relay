@@ -3,6 +3,7 @@ var client   = redis.createClient();
 var key      = require('./redis_key')
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
+var Connection = require('./connection');
 
 /***** Schema *****/
 var userSchema = Schema({
@@ -34,7 +35,7 @@ userSchema.methods.connectWithUser = function(distance, other, callback){
     .zadd(other.keyID("connections"), distance, user._id)
     .exec(function(err, replies){
       if (err) throw err;
-      callback(null, distance);
+      callback(null, new Connection(user, other, distance));
     });
 };
 

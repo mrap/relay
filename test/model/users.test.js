@@ -3,6 +3,7 @@ var should = require('chai').should();
 var expect = require('chai').expect;
 var User = require('../../model/user')
 var UserFixture = require('../fixtures/users.fixture.js');
+var Connection = require('../../model/connection');
 
 describe("User Model", function(){
   describe("creating a user", function(){
@@ -40,10 +41,13 @@ describe("User Model", function(){
         });
       });
 
-      it("should return the connection distance", function(){
-        result.should.eq(dist);
+      it("should return the connection", function(){
+        result.origin.should.eq(user1);
+        result.target.should.eq(user2);
+        result.distance.should.eq(dist);
       });
     };
+
     describe("User#connectUsers", function(){
       beforeEach(function(done){
         UserFixture.createUsers(2, null, function(err, users){
@@ -54,7 +58,7 @@ describe("User Model", function(){
             done();
           });
         });
-      })
+      });
       testUsersConnected();
     });
 
@@ -68,8 +72,24 @@ describe("User Model", function(){
             done();
           });
         });
-      })
+      });
       testUsersConnected();
+    });
+
+    describe("#getConnectedUsers", function(){
+      beforeEach(function(done){
+        UserFixture.createUsers(2, null, function(err, users){
+          user1 = users[0];
+          user2 = users[1];
+          User.connectUsers([user1, user2], dist, function(err, res){
+            result = res;
+            done();
+          });
+        });
+      });
+
+      // it("should return an array of connections")
+
     });
   })
 })
