@@ -40,9 +40,11 @@ userSchema.methods.connectWithUser = function(distance, other, callback){
     });
 };
 
-userSchema.methods.getFeed = function(callback){
-  var args = [user.keyID("feed"), 0, -1, 'WITHSCORES'];
+userSchema.methods.getFeedPostIds = function(callback){
+  var args = [this.keyID("feed"), 0, -1, 'WITHSCORES'];
   client.zrange(args, function(err, res){
+    if (err) throw err;
+    callback(null, res);
   });
 };
 
@@ -118,5 +120,8 @@ User.getConnectedUsers = function(user, callback){
   });
 };
 
+User.feedKeyForID = function(id){
+  return key.keyIDAttribute("user", id.toString(), "feed" );
+}
 
 module.exports = User;
