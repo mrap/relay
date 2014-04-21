@@ -1,15 +1,18 @@
 require('../test_helper')
-var should = require('chai').should()
+var should = require('chai').should();
+var expect = require('chai').expect;
 var User = require('../../model/user')
+var UserFixture = require('../fixtures/users.fixture.js');
 
 describe("User Model", function(){
   describe("creating a user", function(){
     var user
+    var attrs = {};
     beforeEach(function(done){
-      User.createUser({}, function(err, res){
-        user = res
-        done()
-      })
+      UserFixture.createUser(attrs, function(err, res){
+        user = res;
+        done();
+      });
     })
 
     it("should have a mongo id", function(){
@@ -21,43 +24,34 @@ describe("User Model", function(){
     })
   })
 
-  describe("#connectUsers", function(){
-    var client = require('redis').createClient();
-    var key = require('../../model/redis_key');
+  describe("#connectWithUser", function(){
     var user1 = null;
     var user2 = null;
     var dist = 10;
     var result = null;
     beforeEach(function(done){
-      User.createUser({}, function(err, res){
-        user1 = res;
-        User.createUser({}, function(err, res){
-          user2 = res;
-          User.connectUsers([user1, user2], dist, function(err, res){
-            result = res;
-            done();
-          });
+      UserFixture.createUsers(2, null, function(err, users){
+        user1 = users[0];
+        user2 = users[1];
+        user1.connectWithUser(dist, user2, function(err, res){
+          result = res;
+          done();
         });
-      })
+      });
     })
 
     it("should create a connection for both users", function(done){
-      var key1 = key.keyIDAttribute('user', user1._id, 'connections');
-      var key2 = key.keyIDAttribute('user', user2._id, 'connections');
-      client.zscore(key1, user2._id, function(err, res){
-        if (err) throw(err);
-        res.should.eq(dist.toString());
-        client.zscore(key2, user1._id, function(err, res){
-          if (err) throw(err);
-          res.should.eq(dist.toString());
+      user1.getConnectionsCount(function(err, res){
+        expect(res).to.eq(1);
+        user2.getConnectionsCount(function(err, res){
+          expect(res).to.eq(1);
           done();
-        })
-      })
-
-    })
+        });
+      });
+    });
 
     it("should return the connection distance", function(){
-      result.should.eq(dist)
-    })
+      result.should.eq(dist);
+    });
   })
 })
