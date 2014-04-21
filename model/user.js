@@ -4,6 +4,7 @@ var key      = require('./redis_key')
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 var Connection = require('./connection');
+var ObjectId = mongoose.Types.ObjectId;
 
 /***** Schema *****/
 var userSchema = Schema({
@@ -35,8 +36,14 @@ userSchema.methods.connectWithUser = function(distance, other, callback){
     .zadd(other.keyID("connections"), distance, user._id)
     .exec(function(err, replies){
       if (err) throw err;
-      callback(null, new Connection(user, other, distance));
+      callback(null, new Connection(user._id, other._id, distance));
     });
+};
+
+userSchema.methods.getFeed = function(callback){
+  var args = [user.keyID("feed"), 0, -1, 'WITHSCORES'];
+  client.zrange(args, function(err, res){
+  });
 };
 
 /**
@@ -49,9 +56,37 @@ userSchema.methods.getConnectionsCount = function(callback){
   });
 };
 
+/**
+ * Returns an array of user's connections.
+ */
+userSchema.methods.getConnections = function(callback){
+  var user = this;
+  var args = [user.keyID("connections"), 0, -1, 'WITHSCORES'];
+  client.zrange(args, function(err, res){
+    if (err) throw err;
+    var connections = new Array();
+    var length = res.length
+    var otherID = null;
+    var distance = null;
+    for(var i = 0; i < length; i += 2){
+      otherID = new ObjectId(res[i]);
+      distance = res[i+1];
+      connections.push(new Connection(user._id, otherID, distance));
+    }
+    callback(err, connections);
+  });
+};
 
 /***** Compile User Model with Schema *****/
 var User = mongoose.model('User', userSchema);
+
+Array.prototype.containsUser = function(user){
+  for (var i = this.length-1; i >= 0; i--) {
+    if (!('_id' in this[i])) continue;
+    if (this[i]._id.toString() == user._id.toString()) return true;
+  }
+  return false;
+};
 
 User.createUser = function(attrs, callback){
   var newUser = new User(attrs)
@@ -68,5 +103,20 @@ User.connectUsers = function(users, distance, callback){
   var user2 = users[1];
   user1.connectWithUser(distance, user2, callback);
 };
+
+User.getConnectedUsers = function(user, callback){
+  var model = this;
+  user.getConnections(function(err, connections){
+    // Extract an array of the connected user's ids
+    var ids  = new Array();
+    for(var i = 0; i < connections.length; i++)
+      ids.push(connections[i].target);
+    model.find({'_id': {'$in': ids}}, function(err, res){
+      if (err) throw err;
+      callback(null, res);
+    });
+  });
+};
+
 
 module.exports = User;

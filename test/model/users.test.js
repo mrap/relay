@@ -42,8 +42,8 @@ describe("User Model", function(){
       });
 
       it("should return the connection", function(){
-        result.origin.should.eq(user1);
-        result.target.should.eq(user2);
+        result.origin.should.eq(user1._id);
+        result.target.should.eq(user2._id);
         result.distance.should.eq(dist);
       });
     };
@@ -76,7 +76,7 @@ describe("User Model", function(){
       testUsersConnected();
     });
 
-    describe("#getConnectedUsers", function(){
+    describe("getting user's connections", function(){
       beforeEach(function(done){
         UserFixture.createUsers(2, null, function(err, users){
           user1 = users[0];
@@ -88,8 +88,36 @@ describe("User Model", function(){
         });
       });
 
-      // it("should return an array of connections")
+      describe("#getConnection", function(){
+        it("should return array of connections with _ids", function(done){
+          user1.getConnections(function(err, connections){
+            var first = connections[0];
+            first.target.toString().should.eq(result.target.toString());
+            done();
+          });
+        });
+      });
 
+      describe("User#getConnectedUsers", function(){
+        var user3 = null;
+        beforeEach(function(done){
+          UserFixture.createUser(null, function(err, user){
+            user3 = user;
+            user1.connectWithUser(dist, user3, function(err, res){
+              done();
+            });
+          });
+        });
+
+        it("should return array of connections with User objects", function(done){
+          User.getConnectedUsers(user1, function(err, connections){
+            var first = connections[0];
+            connections.containsUser(user2).should.be.true;
+            connections.containsUser(user3).should.be.true;
+            done();
+          });
+        });
+      });
     });
   })
 })
