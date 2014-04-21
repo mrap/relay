@@ -9,4 +9,12 @@ var Connection = function Connection(origin, target, distance){
   this.distance = distance;
 };
 
+Connection.targetIdsOnly = function(connections) {
+  // Extract an array of the connected user's ids
+  var ids  = new Array();
+  for(var i = 0; i < connections.length; i++)
+  if (connections[i].target.constructor.name == 'ObjectID') ids.push(connections[i].target);
+  return ids;
+};
+
 module.exports = Connection;
