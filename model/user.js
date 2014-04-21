@@ -82,7 +82,7 @@ var User = mongoose.model('User', userSchema);
 
 Array.prototype.containsUser = function(user){
   for (var i = this.length-1; i >= 0; i--) {
-    if (!('_id' in this[i])) continue;
+    if ('undefined' !== typeof this[i]['prop']) continue;
     if (this[i]._id.toString() == user._id.toString()) return true;
   }
   return false;
