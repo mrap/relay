@@ -14,9 +14,13 @@ var Fixture = {
     return attrs;
   },
 
-  createUser: function(attrs){
+  createUser: function(attrs, callback){
     attrs = this.ensureRequiredAttrs(attrs);
-    return User.createUser(attrs);
+    
+    var user = User.createUser(attrs);
+    user.once("created", function(){
+      callback(null, user);
+    });
   },
 
   createUsers: function(userCount, attrs, callback){
@@ -25,8 +29,7 @@ var Fixture = {
     users = [];
     function createAnother(current){
       if (current == userCount) return callback(null, users);
-      var user = self.createUser(attrs);
-      user.once("created", function(){
+      self.createUser(attrs, function(err, user){
         users.push(user);
         return createAnother(current+1);
       });
@@ -38,8 +41,7 @@ var Fixture = {
     var self = this;
 
     /** Create user **/
-    var user = self.createUser(userAttrs);
-    user.once("created", function(){
+    self.createUser(userAttrs, function(err, user){
       /** Create Other Users **/
       self.createUsers(connectionsCount, null, function(err, users){
 

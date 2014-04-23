@@ -22,8 +22,7 @@ var Fixture = {
         callback(null, post);
       });
     } else {
-      var user = UserFixture.createUser(null);
-      user.on("created", function(){
+      UserFixture.createUser(null, function(err, user){
         attrs._author = user._id;
         var post = Post.createPost(attrs);
         post.once("created", function(){

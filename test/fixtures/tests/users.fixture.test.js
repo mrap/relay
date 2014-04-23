@@ -6,8 +6,11 @@ describe("UserFixture", function(){
   describe("Create a User", function(){
     var user = null;
     beforeEach(function(done){
-      user = UserFixture.createUser(null);
-      user.on("created", done);
+      UserFixture.createUser(null, function(err, res){
+        if (err) throw err;
+        user = res;
+        done();
+      });
     });
 
     it("should be successful", function(){

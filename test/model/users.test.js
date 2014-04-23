@@ -11,8 +11,10 @@ describe("User Model", function(){
     var originalPassword = "mypassword";
     var attrs = { password: originalPassword };
     beforeEach(function(done){
-      user = UserFixture.createUser(attrs);
-      user.once("created", done);
+      UserFixture.createUser(attrs, function(err, u){
+        user = u;
+        done();
+      });
     })
 
     it("should have a mongo id", function(){
@@ -120,10 +122,10 @@ describe("User Model", function(){
       describe("User#getConnectedUsers", function(){
         var user3 = null;
         beforeEach(function(done){
-          user3 = UserFixture.createUser(null);
-          user3.once("created", function(){
-            user1.once("connected", function() {done(); });
+          UserFixture.createUser(null, function(err, u){
+            user3 = u;
             user1.connectWithUser(dist, user3);
+            user1.once("connected", function() {done(); });
           });
         });
 

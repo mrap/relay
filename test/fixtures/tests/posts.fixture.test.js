@@ -15,8 +15,10 @@ describe("PostFixture", function(){
     describe("with a user", function(){
       var author = null;
       beforeEach(function(done){
-        author = UserFixture.createUser(null);
-        author.once("created", done);
+        UserFixture.createUser(null, function(err, user){
+          author = user;
+          done();
+        });
       });
 
       it("should be successful", function(done){
