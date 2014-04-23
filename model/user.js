@@ -5,7 +5,21 @@ var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 var Connection = require('./connection');
 var ObjectId = mongoose.Types.ObjectId;
-var Auth     = require('../config/private/auth.private');
+var bcrypt   = require('bcrypt');
+
+
+/*** Encryption ***/
+var generateHash = function(data, callback){
+  bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(data, salt, function(err, hash) {
+      callback(err, hash);
+    });
+  });
+};
+
+var matchesHash = function(data, hash, callback){
+  bcrypt.compare(data, hash, callback);
+}
 
 /***** Schema *****/
 var userSchema = Schema({
@@ -62,7 +76,7 @@ userSchema.methods.getConnectionsCount = function(callback){
 };
 
 userSchema.methods.isValidPassword = function(data, callback){
-  Auth.matchesHash(data, this.password, callback);
+  matchesHash(data, this.password, callback);
 };
 
 /**
@@ -105,7 +119,7 @@ User.createUser = function(attrs){
     newUser.emit("error", new Error("User requires a password"));
     return newUser;
   }
-  Auth.generateHash(newUser.password, function(err, hash){
+  generateHash(newUser.password, function(err, hash){
     if (err) throw err;
     newUser.password = hash;
     newUser.save(function(err){
