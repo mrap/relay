@@ -23,8 +23,9 @@ var matchesHash = function(data, hash, callback){
 
 /***** Schema *****/
 var userSchema = Schema({
-  posts:    [{type: Schema.Types.ObjectId, ref: 'Post'}],
-  password: { type: String, required: true }
+  posts     : [{type: Schema.Types.ObjectId, ref: 'Post'}],
+  email     : { type: String, required: true, unique: true},
+  password  : { type: String, required: true }
 });
 
 /**
@@ -123,8 +124,8 @@ User.createUser = function(attrs){
     if (err) throw err;
     newUser.password = hash;
     newUser.save(function(err){
-      if (err) throw err;
-      newUser.emit("created");
+      if (err) newUser.emit("error", err);
+      else     newUser.emit("created");
     });
   });
   return newUser;

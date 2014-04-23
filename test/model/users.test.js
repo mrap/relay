@@ -8,13 +8,12 @@ var Connection = require('../../model/connection');
 describe("User Model", function(){
   describe("creating a user", function(){
     var user
+    var email = "mrap@relay.com";
     var originalPassword = "mypassword";
-    var attrs = { password: originalPassword };
+    var attrs = { email: email, password: originalPassword };
     beforeEach(function(done){
-      UserFixture.createUser(attrs, function(err, u){
-        user = u;
-        done();
-      });
+      user = User.createUser(attrs);
+      user.on("created", done);
     })
 
     it("should have a mongo id", function(){

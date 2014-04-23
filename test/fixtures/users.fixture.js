@@ -1,4 +1,5 @@
 var User = require('../../model/user');
+var Factory = require('../factories');
 
 var Fixture = {
   requiredAttrs: function(){
@@ -15,11 +16,8 @@ var Fixture = {
   },
 
   createUser: function(attrs, callback){
-    attrs = this.ensureRequiredAttrs(attrs);
-    
-    var user = User.createUser(attrs);
-    user.once("created", function(){
-      callback(null, user);
+    Factory.create('User', attrs, function(err, user){
+      callback(err, user);
     });
   },
 
