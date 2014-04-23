@@ -5,10 +5,12 @@ var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 var Connection = require('./connection');
 var ObjectId = mongoose.Types.ObjectId;
+var Auth     = require('../config/private/auth.private');
 
 /***** Schema *****/
 var userSchema = Schema({
-  posts: [{type: Schema.Types.ObjectId, ref: 'Post'}]
+  posts:    [{type: Schema.Types.ObjectId, ref: 'Post'}],
+  password: { type: String, required: true }
 });
 
 /**
@@ -59,6 +61,10 @@ userSchema.methods.getConnectionsCount = function(callback){
   });
 };
 
+userSchema.methods.isValidPassword = function(data, callback){
+  Auth.matchesHash(data, this.password, callback);
+};
+
 /**
  * Returns an array of user's connections.
  */
@@ -93,9 +99,19 @@ Array.prototype.containsUser = function(user){
 
 User.createUser = function(attrs){
   var newUser = new User(attrs);
-  newUser.save(function(err){
+
+  // Guarantee Password
+  if (typeof attrs.password === 'undefined') {
+    newUser.emit("error", new Error("User requires a password"));
+    return newUser;
+  }
+  Auth.generateHash(newUser.password, function(err, hash){
     if (err) throw err;
-    newUser.emit("created");
+    newUser.password = hash;
+    newUser.save(function(err){
+      if (err) throw err;
+      newUser.emit("created");
+    });
   });
   return newUser;
 }

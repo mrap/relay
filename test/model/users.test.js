@@ -8,7 +8,8 @@ var Connection = require('../../model/connection');
 describe("User Model", function(){
   describe("creating a user", function(){
     var user
-    var attrs = {};
+    var originalPassword = "mypassword";
+    var attrs = { password: originalPassword };
     beforeEach(function(done){
       user = UserFixture.createUser(attrs);
       user.once("created", done);
@@ -21,6 +22,26 @@ describe("User Model", function(){
     it("should have no posts", function(){
       user.posts.should.be.empty
     })
+
+    it("should hash the password", function(){
+      expect(user.password).to.not.eq(originalPassword);
+    });
+
+    describe("checking for a valid password", function(){
+      it("should return true for a valid password", function(done){
+        user.isValidPassword(originalPassword, function(err, res){
+          expect(res).to.be.true;
+          done();
+        });
+      });
+
+      it("should return false for a valid password", function(done){
+        user.isValidPassword("not-my-password", function(err, res){
+          expect(res).to.be.false;
+          done();
+        });
+      });
+    });
   })
 
   describe("connecting users", function(){

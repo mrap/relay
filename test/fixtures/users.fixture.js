@@ -2,13 +2,16 @@ var User = require('../../model/user');
 
 var Fixture = {
   requiredAttrs: function(){
-    return {};
+    return { password: "a-very-secure-password" };
   },
 
   ensureRequiredAttrs: function(attrs){
-    for (a in this.requiredAttrs) 
-      if (!attrs.hasOwnProperty(a)) attrs[a] = this.requiredAttrs[a];
-    return attrs || {};
+    attrs = attrs || {};
+    for (a in this.requiredAttrs())
+      if (typeof attrs[a] === 'undefined') {
+        attrs[a] = this.requiredAttrs()[a];
+      }
+    return attrs;
   },
 
   createUser: function(attrs){
@@ -27,7 +30,7 @@ var Fixture = {
         users.push(user);
         return createAnother(current+1);
       });
-    } 
+    }
     createAnother(0);
   },
 

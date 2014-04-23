@@ -1,18 +1,22 @@
 require('../../test_helper');
+var expect = require('chai').expect;
 var UserFixture = require('../users.fixture');
 
 describe("UserFixture", function(){
   describe("Create a User", function(){
     var user = null;
     beforeEach(function(done){
-      UserFixture.createUsers(3, null, function(err, res){
-        user = res;
-        done();
-      });
+      user = UserFixture.createUser(null);
+      user.on("created", done);
     });
 
     it("should be successful", function(){
       user.should.exist;
+    });
+
+    it("should have a password", function(){
+      expect(user.password).to.exist;
+      expect(user.password).to.be.a('string');
     });
   });
 
