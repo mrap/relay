@@ -1,8 +1,10 @@
 var mongoose  = require('mongoose'),
+    ObjectId  = mongoose.Types.ObjectId,
     Schema    = mongoose.Schema,
     client    = require('redis').createClient(),
-    redis_key = require('./redis_key');
-var User = require('./user')
+    redis_key = require('./redis_key'),
+    User      = require('mongoose').model('User');
+
 var postSchema = Schema({
   _author: {type: Schema.Types.ObjectId, ref: 'User', required: true}
 });
@@ -10,10 +12,11 @@ var postSchema = Schema({
 // Note: Temp const.  This will change later in the project.
 var DEFAULT_POST_SCORE = 10;
 
-postSchema.methods.updateConnectedFeeds = function(){
+postSchema.methods.updateAuthorConnectedFeeds = function(author){
   var post = this;
+  if (post._author.toString() != author._id.toString()) throw err;
   /*** Get author's connections ***/
-  post.author.getConnections(function(err, connections){
+  author.getConnections(function(err, connections){
     /*** Add post to each feed ***/
     var transaction = client.multi();
     var otherUserId = null;
@@ -30,41 +33,23 @@ postSchema.methods.updateConnectedFeeds = function(){
   });
 };
 
-postSchema.methods.assignAuthor = function(){
-  var post = this;
-  /*** Add to Author's Posts ***/
-  User.findById(post._author, 'posts' , function(err, res){
-    if (err) throw err;
-    var author = res;
-    author.posts.push(post._id);
-    author.save(function(err){
-      if (err) throw err;
-      post.author = new User(author);
-      post.emit("assignedAuthor", post.author);
-    });
-  });
-};
-
-var Post = mongoose.model('Post', postSchema);
-
-Post.createPost = function(attrs){
+/***** Static Model Methods *****/
+postSchema.statics.createPostByUser = function(user, attrs, callback){
   /*** Save Post ***/
   var newPost = new Post(attrs);
-  newPost.once("new", newPost.assignAuthor);
-  newPost.once("assignedAuthor", newPost.updateConnectedFeeds);
-  newPost.once("updatedConnectedFeeds", function(){
-    newPost.emit("created");
+  newPost._author = user;
+  newPost.save(function(err){
+    if (err) return callback(err, null);
+    /*** Add to Author's posts ***/
+    User.addPost(user, newPost, function(err, post, user){
+      if (err) return callback(err, null);
+      callback(null, post);
+      newPost.updateAuthorConnectedFeeds(user);
+    });
   });
-  newPost.on("updatedConnectedFeeds", function(){
-    newPost.emit("saved");
-  })
-
-  newPost.save(function(err){ 
-    if (err) throw err; 
-    newPost.emit("new");
-  });
-
   return newPost;
 };
 
-module.exports = Post;
+
+var Post = mongoose.model('Post', postSchema);
+

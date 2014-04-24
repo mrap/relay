@@ -1,24 +1,47 @@
-require('../test_helper')
-var should = require('chai').should();
-var expect = require('chai').expect;
-var User = require('../../model/user')
-var UserFixture = require('../fixtures/users.fixture.js');
-var Connection = require('../../model/connection');
+var should = require('chai').should()
+  , expect = require('chai').expect
+  , Factory  = require('../factories')
+  , User  = require('mongoose').model('User');
 
 describe("User Model", function(){
+  var user = null;
+  describe("building a user instance", function(){
+    beforeEach(function(done){
+      Factory.build('User', function(err, u){
+        user = u;
+        done();
+      });
+    });
+
+    it("needs to be encrypted", function(){
+      user.needsEncryption.should.be.true;
+    });
+
+    it("does not need to be encrypted after save", function(done){
+      user.save(function(err){
+        if (err) done(err);
+        else {
+          user.needsEncryption.should.be.false;
+          done();
+        }
+      });
+    });
+  });
+
   describe("creating a user", function(){
-    var user
     var email = "mrap@relay.com";
     var originalPassword = "mypassword";
     var attrs = { email: email, password: originalPassword };
     beforeEach(function(done){
-      user = User.createUser(attrs);
-      user.on("created", done);
-    })
+      Factory.build('User', attrs, function(err, u){
+        user = u;
+        user.save(done);
+      });
+    });
 
     it("should have a mongo id", function(){
-      user.id.should.exist
-    })
+      user.id.should.exist;
+    });
 
     it("should have no posts", function(){
       user.posts.should.be.empty
@@ -50,6 +73,14 @@ describe("User Model", function(){
     var user2 = null;
     var dist = 10;
     var result = null;
+    beforeEach(function(done){
+      Factory.createList('User', 2, function(err, users){
+        if (err) return done(err);
+        user1 = users[0];
+        user2 = users[1];
+        done();
+      });
+    });
     var testUsersConnected = function(){
       it("should create a connection for both users", function(done){
         user1.getConnectionsCount(function(err, count){
@@ -70,70 +101,44 @@ describe("User Model", function(){
 
     describe("User#connectUsers", function(){
       beforeEach(function(done){
-        UserFixture.createUsers(2, null, function(err, users){
-          user1 = users[0];
-          user2 = users[1];
-          User.connectUsers([user1, user2], dist, function(err, res){
-            result = res;
-            done();
-          });
+        User.connectUsers([user1, user2], dist, function(err, res){
+          if (err) return done(err);
+          result = res;
+          done();
         });
       });
+
       testUsersConnected();
-    });
 
-    describe("#connectUsers", function(){
-      beforeEach(function(done){
-        UserFixture.createUsers(2, null, function(err, users){
-          user1 = users[0];
-          user2 = users[1];
-          User.connectUsers([user1, user2], dist, function(err,res){
-            result = res;
-            done();
-          })
-        });
-      });
-      testUsersConnected();
-    });
-
-    describe("getting user's connections", function(){
-      beforeEach(function(done){
-        UserFixture.createUsers(2, null, function(err, users){
-          user1 = users[0];
-          user2 = users[1];
-          User.connectUsers([user1, user2], dist, function(err, res){
-            result = res;
-            done();
-          });
-        });
-      });
-
-      describe("#getConnection", function(){
-        it("should return array of connections with _ids", function(done){
-          user1.getConnections(function(err, connections){
-            var first = connections[0];
-            first.target.toString().should.eq(result.target.toString());
-            done();
-          });
-        });
-      });
-
-      describe("User#getConnectedUsers", function(){
+      describe("getting user's connections", function(){
         var user3 = null;
         beforeEach(function(done){
-          UserFixture.createUser(null, function(err, u){
+          Factory.create('User', function(err, u){
+            if (err) return done(err);
             user3 = u;
-            user1.connectWithUser(dist, user3);
-            user1.once("connected", function() {done(); });
+            user1.connectWithUser(dist, user3, function(err, connection){
+              done();
+            });
+          });
+        });
+        describe("#getConnection", function(){
+          it("should return array of connections with _ids", function(done){
+            user1.getConnections(function(err, connections){
+              var first = connections[0];
+              first.target.toString().should.eq(result.target.toString());
+              done();
+            });
           });
         });
 
-        it("should return array of connections with User objects", function(done){
-          User.getConnectedUsers(user1, function(err, connections){
-            var first = connections[0];
-            connections.containsUser(user2).should.be.true;
-            connections.containsUser(user3).should.be.true;
-            done();
+        describe("User#getConnectedUsers", function(){
+          it("should return array of connections with User objects", function(done){
+            User.getConnectedUsers(user1, function(err, connections){
+              var first = connections[0];
+              connections.containsUser(user2).should.be.true;
+              connections.containsUser(user3).should.be.true;
+              done();
+            });
           });
         });
       });

@@ -1,3 +1,4 @@
+var db = require('./model/db.js');
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -7,7 +8,6 @@ var bodyParser = require('body-parser');
 
 // Configure Environment
 var env = process.env.NODE_ENV || 'development';
-var db = require('./model/db.js');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -40,7 +40,7 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (app.get('env') !== 'production') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {

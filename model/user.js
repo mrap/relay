@@ -19,13 +19,39 @@ var generateHash = function(data, callback){
 
 var matchesHash = function(data, hash, callback){
   bcrypt.compare(data, hash, callback);
-}
+};
 
 /***** Schema *****/
 var userSchema = Schema({
   posts     : [{type: Schema.Types.ObjectId, ref: 'Post'}],
   email     : { type: String, required: true, unique: true},
   password  : { type: String, required: true }
+});
+
+userSchema.pre('save', function(next){
+  var user = this;
+  if (!user.needsEncryption) return next();
+  generateHash(user.password, function(err, hash){
+    if (err) return next(err);
+    user.password = hash;
+    next();
+  });
+});
+
+userSchema.post('save', function(user){
+  user._needsEncryption = false;
+});
+
+userSchema.virtual('needsEncryption').set(function(b){
+  this._needsEncryption = b;
+});
+
+userSchema.virtual('needsEncryption').get(function(){
+  if (typeof this._needsEncryption !== 'undefined') return this._needsEncryption;
+  else {
+    this._needsEncryption = true;
+    return this._needsEncryption;
+  }
 });
 
 /**
@@ -46,14 +72,14 @@ userSchema.methods.keyID = function(attr) {
  * @param other    user     cannot be self
  * @param callback callback returns distance
  */
-userSchema.methods.connectWithUser = function(distance, other){
+userSchema.methods.connectWithUser = function(distance, other, callback){
   var user = this;
   client.multi()
     .zadd(user.keyID("connections"), distance, other._id)
     .zadd(other.keyID("connections"), distance, user._id)
     .exec(function(err, replies){
-      if (err) throw err;
-      user.emit("connected", new Connection(user._id, other._id, distance));
+      if (err) console.error(err);
+      callback(err, new Connection(user._id, other._id, distance));
     });
 };
 
@@ -101,48 +127,18 @@ userSchema.methods.getConnections = function(callback){
   });
 };
 
-/***** Compile User Model with Schema *****/
-var User = mongoose.model('User', userSchema);
-
-Array.prototype.containsUser = function(user){
-  for (var i = this.length-1; i >= 0; i--) {
-    if ('undefined' !== typeof this[i]['prop']) continue;
-    if (this[i]._id.toString() == user._id.toString()) return true;
-  }
-  return false;
-};
-
-User.createUser = function(attrs){
-  var newUser = new User(attrs);
-
-  // Guarantee Password
-  if (typeof attrs.password === 'undefined') {
-    newUser.emit("error", new Error("User requires a password"));
-    return newUser;
-  }
-  generateHash(newUser.password, function(err, hash){
-    if (err) throw err;
-    newUser.password = hash;
-    newUser.save(function(err){
-      if (err) newUser.emit("error", err);
-      else     newUser.emit("created");
-    });
-  });
-  return newUser;
-}
-
-User.connectUsers = function(users, distance, callback){
+/***** Static Model Methods *****/
+userSchema.statics.connectUsers = function(users, distance, callback){
   if (!(users instanceof Array) || users.length != 2)
     return callback(new Error("Needs two users to connect"), null);
   var user1 = users[0];
   var user2 = users[1];
-  user1.once("connected", function(newConnection){
-    callback(null, newConnection);
+  user1.connectWithUser(distance, user2, function(err, connection){
+    callback(null, connection);
   });
-  user1.connectWithUser(distance, user2);
 };
 
-User.getConnectedUsers = function(user, callback){
+userSchema.statics.getConnectedUsers = function(user, callback){
   var model = this;
   user.getConnections(function(err, connections){
     // Extract an array of the connected user's ids
@@ -156,8 +152,37 @@ User.getConnectedUsers = function(user, callback){
   });
 };
 
-User.feedKeyForID = function(id){
+userSchema.statics.feedKeyForID = function(id){
   return key.keyIDAttribute("user", id.toString(), "feed" );
-}
+};
 
-module.exports = User;
+
+/**
+ * Adds a post to a user's posts.
+ * callback returns (error, post, user)
+ */
+userSchema.statics.addPost = function(id, post, callback){
+  User.findById(id, function(err, res){
+    if (err) return callback(err, null, null);
+    var user = res;
+    if (user.posts.indexOf(post._id) !== -1) return callback(new Error("User already has post: " + post), null, null);
+    user.posts.push(post._id);
+    user.save(function(err){
+      if (err) return callback(err, null, null);
+      post._author = user;
+      callback(null, post, user);
+    });
+  });
+};
+
+/***** Compile User Model with Schema *****/
+var User = mongoose.model('User', userSchema);
+
+Array.prototype.containsUser = function(user){
+  for (var i = this.length-1; i >= 0; i--) {
+    if ('undefined' !== typeof this[i]['prop']) continue;
+    if (this[i]._id.toString() == user._id.toString()) return true;
+  }
+  return false;
+};
+

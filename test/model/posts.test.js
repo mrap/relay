@@ -1,29 +1,48 @@
-require('../test_helper');
 var chai = require('chai'),
     should = chai.should(),
-    expect = chai.expect;
+    expect = chai.expect,
+    Factory = require('../factories'),
+    UserFixture = require('../fixtures/users.fixture'),
+    mongoose = require('mongoose'),
+    Post = mongoose.model('Post'),
+    User = mongoose.model('User');
 
-var User        = require('../../model/user'),
-    UserFixture = require('../fixtures/users.fixture');
-var Post = require('../../model/post');
 describe("Post Model", function(){
+  var post = null;
+  var user = null;
+
   describe("Creating a post", function(){
-    var post = null;
-    var user = null;
+    beforeEach(function(done){
+      Factory.create('User', function(err, u){
+        if (err) return done(err);
+        user = u;
+        Post.createPostByUser(user, null, function(err, p){
+          if (err) return done(err);
+          post = p;
+          done();
+        });
+      });
+    });
+
+    it("should have an _author reference", function(){
+      post._author.toString().should.eq(user._id.toString());
+    });
+  });
+
+  describe("Creating a post", function(){
     beforeEach(function(done){
       UserFixture.createUserWithConnections(3, 10, null, function(err, res){
+        if (err) return done(err);
         user = res;
-        post = Post.createPost({_author: user._id});
-        post.on("created", done);
+        Post.createPostByUser(user, null,function(err, p){
+          post = p;
+          done();
+        });
       })
     })
 
     it("should save and return and the post", function(){
       post.should.exist
-    })
-
-    it("should have the authors user id", function(){
-      expect(post._author).to.eq(user._id)
     })
 
     it("should be saved to the author's posts", function(done){

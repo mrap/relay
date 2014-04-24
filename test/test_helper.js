@@ -1,18 +1,30 @@
 
 /*** Global Suite Setup and Tear Down ***/
+var mongoose = require('mongoose');
 
 /*** Setup ***/
-beforeEach(function(done){
+before(function(done){
+  console.log("TEST BEGIN");
   process.env.NODE_ENV = 'test'
-  require('mocha-mongoose')('mongodb://localhost/relay_test');
-  require('../app')
+  require('../app');
+  require('./factories');
   done();
 });
 
-afterEach(function(done){
-  // var mongoose = require('mongoose');
-  // mongoose.models = {}
-  // mongoose.modelSchemas = {}
+beforeEach(function(done){
+  mongoose.connection.collections['users'].drop( function(err) {
+    if (err && err.message != "ns not found" ) console.error(err);
+    mongoose.connection.collections['posts'].drop( function(err) {
+      if (err && err.message != "ns not found" ) console.error(err);
+      done();
+    });
+  });
+});
+
+after(function(done){
+  mongoose.models = {}
+  mongoose.modelSchemas = {}
+  mongoose.disconnect();
   done();
 });
 
