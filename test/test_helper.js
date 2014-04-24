@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 
 /*** Setup ***/
 before(function(done){
-  console.log("TEST BEGIN");
   process.env.NODE_ENV = 'test'
   require('../app');
   require('./factories');

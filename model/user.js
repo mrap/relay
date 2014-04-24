@@ -1,12 +1,11 @@
-var redis    = require('redis');
-var client   = redis.createClient();
-var key      = require('./redis_key')
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
-var Connection = require('./connection');
-var ObjectId = mongoose.Types.ObjectId;
-var bcrypt   = require('bcrypt');
-
+var redis      = require('redis')
+  , client     = redis.createClient()
+  , key        = require('./redis_key')
+  , mongoose   = require('mongoose')
+  , Schema     = mongoose.Schema
+  , Connection = require('./connection')
+  , ObjectId   = mongoose.Types.ObjectId
+  , bcrypt     = require('bcrypt');
 
 /*** Encryption ***/
 var generateHash = function(data, callback){

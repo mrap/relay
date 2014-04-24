@@ -1,10 +1,10 @@
-var db = require('./model/db.js');
-var express = require('express');
-var path = require('path');
-var favicon = require('static-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var db           = require('./model/db.js')
+  , express      = require('express')
+  , path         = require('path')
+  , favicon      = require('static-favicon')
+  , logger       = require('morgan')
+  , cookieParser = require('cookie-parser')
+  , bodyParser   = require('body-parser');
 
 // Configure Environment
 var env = process.env.NODE_ENV || 'development';

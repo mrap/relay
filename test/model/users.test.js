@@ -1,7 +1,7 @@
-var should = require('chai').should()
-  , expect = require('chai').expect
-  , Factory  = require('../factories')
-  , User  = require('mongoose').model('User');
+var should  = require('chai').should()
+  , expect  = require('chai').expect
+  , Factory = require('../factories')
+  , User    = require('mongoose').model('User');
 
 describe("User Model", function(){
   var user = null;
@@ -29,9 +29,9 @@ describe("User Model", function(){
   });
 
   describe("creating a user", function(){
-    var email = "mrap@relay.com";
+    var email            = "mrap@relay.com";
     var originalPassword = "mypassword";
-    var attrs = { email: email, password: originalPassword };
+    var attrs            = { email: email, password: originalPassword };
     beforeEach(function(done){
       Factory.build('User', attrs, function(err, u){
         user = u;
@@ -69,9 +69,9 @@ describe("User Model", function(){
   })
 
   describe("connecting users", function(){
-    var user1 = null;
-    var user2 = null;
-    var dist = 10;
+    var user1  = null;
+    var user2  = null;
+    var dist   = 10;
     var result = null;
     beforeEach(function(done){
       Factory.createList('User', 2, function(err, users){

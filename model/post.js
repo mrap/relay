@@ -1,9 +1,9 @@
-var mongoose  = require('mongoose'),
-    ObjectId  = mongoose.Types.ObjectId,
-    Schema    = mongoose.Schema,
-    client    = require('redis').createClient(),
-    redis_key = require('./redis_key'),
-    User      = require('mongoose').model('User');
+var mongoose  = require('mongoose')
+  , ObjectId  = mongoose.Types.ObjectId
+  , Schema    = mongoose.Schema
+  , client    = require('redis').createClient()
+  , redis_key = require('./redis_key')
+  , User      = require('mongoose').model('User');
 
 var postSchema = Schema({
   _author: {type: Schema.Types.ObjectId, ref: 'User', required: true}
@@ -49,7 +49,6 @@ postSchema.statics.createPostByUser = function(user, attrs, callback){
   });
   return newPost;
 };
-
 
 var Post = mongoose.model('Post', postSchema);
 

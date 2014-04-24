@@ -1,11 +1,11 @@
-var chai = require('chai'),
-    should = chai.should(),
-    expect = chai.expect,
-    Factory = require('../factories'),
+var chai        = require('chai'),
+    should      = chai.should(),
+    expect      = chai.expect,
+    Factory     = require('../factories'),
     UserFixture = require('../fixtures/users.fixture'),
-    mongoose = require('mongoose'),
-    Post = mongoose.model('Post'),
-    User = mongoose.model('User');
+    mongoose    = require('mongoose'),
+    Post        = mongoose.model('Post'),
+    User        = mongoose.model('User');
 
 describe("Post Model", function(){
   var post = null;
@@ -54,7 +54,7 @@ describe("Post Model", function(){
 
     it("should save to each author's connection's feed", function(done){
       User.getConnectedUsers(user, function(err, users){
-        var otherUser = null;
+        var otherUser     = null;
         var callbackCount = 0;
         for(var i = 0; i < users.length; i++){
           otherUser = users[i];
@@ -62,7 +62,7 @@ describe("Post Model", function(){
             // Each callback should increment the callback count
             feed.should.include(post._id.toString());
             callbackCount++;
-            if (callbackCount++ == i) done();
+            if (callbackCount == i) done();
           });
         }
       });
