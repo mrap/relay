@@ -1,3 +1,5 @@
+require('./lib/global_helpers');
+
 var db           = require('./model/db.js')
   , express      = require('express')
   , path         = require('path')
