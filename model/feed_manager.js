@@ -67,6 +67,16 @@ var FeedManager = {
     client.exists(this.userFeedItemKey(userID, itemID), callback);
   },
 
+  getUserFeedPosts: function(user, withScores, callback){
+    var userID = getObjectID(user);
+    var args = [this.userFeedKey(userID), 0, -1];
+    if (withScores) args.push('WITHSCORES');
+    client.zrange(args, function(err, res){
+      if (err) throw err;
+      callback(null, res);
+    });
+  },
+
   getUserFeedItem: function(userID, postID, callback){
     userID = getObjectID(userID);
     postID = getObjectID(postID);
@@ -96,7 +106,7 @@ var FeedManager = {
       // "Relaxes" feedItem's distance
       // Guarantees the shortest origin_distance is set
       function updateAnother(current){
-        if (current >= count) return callback(null, count);
+        if (current >= count) return callback(null, connections);
         var connection = connections[current];
         self.updateFeedItemDistance(connection.target, feedItem, function(err, dist){
           if (err) return callback(err, null);
@@ -105,6 +115,14 @@ var FeedManager = {
       }
       return updateAnother(0);
     });
+  },
+
+  sendNewPostToConnections: function(sender, post, connections, callback){
+    var feedItem = new FeedItem({
+      postID         : getObjectID(post),
+      senderID       : getObjectID(sender)
+    });
+    this.sendItemToConnections(feedItem, connections, callback);
   }
 };
 

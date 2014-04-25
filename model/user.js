@@ -6,7 +6,8 @@ var redis                 = require('redis')
   , UserConnectionManager = require('./user_connection_manager')
   , UserConnection        = require('./user_connection')
   , ObjectId              = mongoose.Types.ObjectId
-  , bcrypt                = require('bcrypt');
+  , bcrypt                = require('bcrypt')
+  , FeedManager           = require('./feed_manager');
 
 /*** Encryption ***/
 var generateHash = function(data, callback){
@@ -69,12 +70,7 @@ userSchema.methods.connectWithUser = function(distance, other, callback){
 };
 
 userSchema.methods.getFeedPostIds = function(callback){
-  var user = this;
-  var args = [user.keyID("feed"), 0, -1, 'WITHSCORES'];
-  client.zrange(args, function(err, res){
-    if (err) throw err;
-    callback(null, res);
-  });
+  FeedManager.getUserFeedPosts(this, false, callback);
 };
 
 userSchema.methods.getConnectionsCount = function(callback){
