@@ -1,11 +1,12 @@
-var redis      = require('redis')
-  , client     = redis.createClient()
-  , key        = require('./redis_key')
-  , mongoose   = require('mongoose')
-  , Schema     = mongoose.Schema
-  , Connection = require('./connection')
-  , ObjectId   = mongoose.Types.ObjectId
-  , bcrypt     = require('bcrypt');
+var redis                 = require('redis')
+  , client                = redis.createClient()
+  , key                   = require('./redis_key')
+  , mongoose              = require('mongoose')
+  , Schema                = mongoose.Schema
+  , UserConnectionManager = require('./user_connection_manager')
+  , UserConnection        = require('./user_connection')
+  , ObjectId              = mongoose.Types.ObjectId
+  , bcrypt                = require('bcrypt');
 
 /*** Encryption ***/
 var generateHash = function(data, callback){
@@ -63,23 +64,8 @@ userSchema.methods.keyID = function(attr) {
   else      return key.keyID("user", this._id);
 };
 
-/**
- * Connects user with another.
- * Connections are reflexive (applies to both users)
- * Overwrites previous connection
- * @param distance integer  cannot be less than 0
- * @param other    user     cannot be self
- * @param callback callback returns distance
- */
 userSchema.methods.connectWithUser = function(distance, other, callback){
-  var user = this;
-  client.multi()
-    .zadd(user.keyID("connections"), distance, other._id)
-    .zadd(other.keyID("connections"), distance, user._id)
-    .exec(function(err, replies){
-      if (err) console.error(err);
-      callback(err, new Connection(user._id, other._id, distance));
-    });
+  UserConnectionManager.connectUsers(this, other, distance, callback);
 };
 
 userSchema.methods.getFeedPostIds = function(callback){
@@ -91,50 +77,21 @@ userSchema.methods.getFeedPostIds = function(callback){
   });
 };
 
-/**
- * Returns number of user's connections to other users.
- */
 userSchema.methods.getConnectionsCount = function(callback){
-  client.zcard(this.keyID("connections"), function(err, count){
-    if (err) throw err;
-    callback(err, count);
-  });
+  UserConnectionManager.getUserConnectionsCount(this, callback);
 };
 
 userSchema.methods.isValidPassword = function(data, callback){
   matchesHash(data, this.password, callback);
 };
 
-/**
- * Returns an array of user's connections.
- */
 userSchema.methods.getConnections = function(callback){
-  var user = this;
-  var args = [user.keyID("connections"), 0, -1, 'WITHSCORES'];
-  client.zrange(args, function(err, res){
-    if (err) throw err;
-    var connections = new Array();
-    var length = res.length;
-    var otherID = null;
-    var distance = null;
-    for(var i = 0; i < length; i += 2){
-      otherID = new ObjectId(res[i]);
-      distance = res[i+1];
-      connections.push(new Connection(user._id, otherID, distance));
-    }
-    callback(null, connections);
-  });
+  UserConnectionManager.getUserConnections(this, callback);
 };
 
 /***** Static Model Methods *****/
-userSchema.statics.connectUsers = function(users, distance, callback){
-  if (!(users instanceof Array) || users.length != 2)
-    return callback(new Error("Needs two users to connect"), null);
-  var user1 = users[0];
-  var user2 = users[1];
-  user1.connectWithUser(distance, user2, function(err, connection){
-    callback(null, connection);
-  });
+userSchema.statics.connectUsers = function(user1, user2, distance, callback){
+  UserConnectionManager.connectUsers(user1, user2, distance, callback);
 };
 
 userSchema.statics.getConnectedUsers = function(user, callback){

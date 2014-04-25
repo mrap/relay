@@ -101,7 +101,7 @@ describe("User Model", function(){
 
     describe("User#connectUsers", function(){
       beforeEach(function(done){
-        User.connectUsers([user1, user2], dist, function(err, res){
+        User.connectUsers(user1, user2, dist, function(err, res){
           if (err) return done(err);
           result = res;
           done();
