@@ -85,6 +85,17 @@ userSchema.methods.getConnections = function(callback){
   UserConnectionManager.getUserConnections(this, callback);
 };
 
+userSchema.methods.relayOwnPost = function(post, callback){
+  var user = this;
+  user.getConnections(function(err, connections){
+    if (err) return callback(err, null);
+    FeedManager.sendNewPostToConnections(user, post, connections, function(err, res){
+      if (err) return callback(err, null);
+      callback(null, res);
+    });
+  });
+};
+
 /***** Static Model Methods *****/
 userSchema.statics.connectUsers = function(user1, user2, distance, callback){
   UserConnectionManager.connectUsers(user1, user2, distance, callback);
@@ -108,21 +119,22 @@ userSchema.statics.feedKeyForID = function(id){
   return key.keyIDAttribute("user", id.toString(), "feed" );
 };
 
-
 /**
  * Adds a post to a user's posts.
  * callback returns (error, post, user)
  */
 userSchema.statics.addPost = function(id, post, callback){
-  User.findById(id, function(err, res){
+  User.findById(id, function(err, user){
     if (err) return callback(err, null, null);
-    var user = res;
     if (user.posts.indexOf(post._id) !== -1) return callback(new Error("User already has post: " + post), null, null);
     user.posts.push(post._id);
     user.save(function(err){
       if (err) return callback(err, null, null);
       post._author = user;
-      callback(null, post, user);
+      user.relayOwnPost(post, function(err, res){
+        if (err) return callback(err, null);
+        callback(null, post, user);
+      })
     });
   });
 };
