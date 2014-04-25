@@ -6,7 +6,7 @@ var FeedManager = require('../../model/feed_manager')
   , Post        = mongoose.model('Post')
   , expect      = require('chai').expect
   , FeedItem    = require('../../model/feed_item');
-  
+
 
 describe("Feed Manager", function(){
   var user             = null;
@@ -56,6 +56,18 @@ describe("Feed Manager", function(){
         checkAnother(current+1);
       }
       checkAnother(0);
+    });
+
+    describe("#getUserFeedItem", function(){
+      it("should return the correct Feed Item", function(done){
+        FeedManager.getUserFeedItem(connectedUserID, post, function(err, item){
+          if (err) done(err);
+          expect(item.postID.toString()).to.eq(feedItem.postID.toString());
+          expect(item.senderID.toString()).to.eq(feedItem.senderID.toString());
+          expect(item.originDistance).to.eq(feedItem.originDistance+1);
+          done();
+        });
+      });
     });
   });
 });

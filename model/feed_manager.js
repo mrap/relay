@@ -1,6 +1,7 @@
-var redis = require('redis')
-  , client = redis.createClient()
-  , key = require('./redis_key');
+var redis    = require('redis')
+  , client   = redis.createClient()
+  , key      = require('./redis_key')
+  , FeedItem = require('./feed_item');
 
 // Add another array's items to an array (Fastest implementation)
 // Source: http://stackoverflow.com/questions/4156101/javascript-push-array-values-into-another-array
@@ -54,6 +55,20 @@ var FeedManager = {
 
   userFeedHasItem: function(userID, itemID, callback){
     client.exists(this.userFeedItemKey(userID, itemID), callback);
+  },
+
+  getUserFeedItem: function(userID, postID, callback){
+    userID = getObjectID(userID);
+    postID = getObjectID(postID);
+    client.hgetall(this.userFeedItemKey(userID, postID), function(err, res){
+      if (err) return callback(err, null);
+      var feedItem = new FeedItem({
+          postID         : postID,
+          senderID       : res.sender,
+          prevSenderID   : res.prevSender,
+          originDistance : res.origin_dist });
+      callback(null, feedItem);
+    });
   },
 
   // 1. Store to user's feeditems Sorted List:
