@@ -4,34 +4,40 @@ var FeedManager = require('../../model/feed_manager')
   , mongoose    = require('mongoose')
   , User        = mongoose.model('User')
   , Post        = mongoose.model('Post')
-  , expect      = require('chai').expect;
+  , expect      = require('chai').expect
+  , FeedItem    = require('../../model/feed_item');
   
 
 describe("Feed Manager", function(){
   var user             = null;
   var post             = null;
+  var feedItem         = null;
   var connectionsCount = 10;
   var connectionsDist  = 20;
+  var connections      = null;
+  var connectedUserID  = null;
   var result           = null;
+
   beforeEach(function(done){
     UserFixture.createUserWithConnections(connectionsCount, connectionsDist, null, function(err, u){
       if (err) done(err);
       user = u;
-      Post.createPostByUser(user, null, function(err, p){
+      Factory.create('Post', function(err, p){
         if (err) done(err);
         post = p;
+        feedItem = new FeedItem({postID: post._id, senderID: user._id, score: 30})
         done();
-      })
+      });
     });
   });
 
   describe("#sendItemToConnections", function(){
-    var connections = null;
     beforeEach(function(done){
       user.getConnections(function(err, res){
         if (err) done(err);
         connections = res;
-        FeedManager.sendItemToConnections(post, connections, user, null, function(err, res){
+        connectedUserID  = connections[0].target;
+        FeedManager.sendItemToConnections(feedItem, connections, function(err, res){
           if (err) done(err);
           result = res;
           done();

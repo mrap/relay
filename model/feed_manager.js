@@ -2,6 +2,15 @@ var redis = require('redis')
   , client = redis.createClient()
   , key = require('./redis_key');
 
+// Add another array's items to an array (Fastest implementation)
+// Source: http://stackoverflow.com/questions/4156101/javascript-push-array-values-into-another-array
+Array.prototype.pushArray = function() {
+  var toPush = this.concat.apply([], arguments);
+  for (var i = 0, len = toPush.length; i < len; ++i) {
+    this.push(toPush[i]);
+  }
+};
+
 var getObjectID = function(obj){
   if      (obj === null) return null;
   else if (obj.constructor.name === 'ObjectID') return obj;
@@ -12,16 +21,21 @@ var getObjectID = function(obj){
 var FeedManager = {
   /*** Chainable Redis commands ***/
   // Prefixed with `__`
-  __addFeedItemWithScore: function(userID, itemID, score){
-    return ["zadd", this.userFeedKey(userID), score, itemID];
+  __addFeedItemScore: function(userID, feedItem){
+    return ["zadd", this.userFeedKey(userID), feedItem.score, feedItem.postID];
   },
 
-  __addFeedItemSender: function(userID, itemID, senderID){
-    return ["hset", this.userFeedItemKey(userID, itemID), "origin", senderID];
+  __addFeedItem: function(userID, feedItem){
+    var feedItemHash = {
+      "sender"      : feedItem.senderID,
+      "origin_dist" : feedItem.originDistance
+    };
+    if (feedItem.prevSenderID) feedItemHash["prev_sender"] = feedItem.prevSenderID;
+    return ["hmset", this.userFeedItemKey(userID, feedItem.postID), feedItemHash];
   },
 
-  __addFeedItemPrevSender: function(userID, itemID, senderID){
-    return ["hset", this.userFeedItemKey(userID, itemID), "prev", senderID];
+  __addFeedItemCommands: function(userID, feedItem){
+    return [ this.__addFeedItemScore(userID, feedItem), this.__addFeedItem(userID, feedItem)];
   },
 
   userFeedKey: function(userID){
@@ -40,19 +54,14 @@ var FeedManager = {
   //    user:userID:feeditems => [ itemID : score, itemID : score, ... ]
   // 2. Store senderID and prevSenderID in hash
   //    user:userID:feeditem  => { origin : senderID, prev: prevSenderID }
-  sendItemToConnections: function(itemID, connections, senderID, prevSenderID, callback){
-    itemID       = getObjectID(itemID);
-    senderID     = getObjectID(senderID);
-    prevSenderID = getObjectID(prevSenderID);
-    if (itemID === null || senderID === null) callback(new Error("Requires itemID("+itemID+") and senderID("+senderID+")"), null);
+  sendItemToConnections: function(feedItem, connections, callback){
     var count = connections.length;
     var commands = [];
     for(var i=count-1; i>=0; i--){
       var connection = connections[i];
-      commands.push(this.__addFeedItemWithScore(connection.target, itemID, connection.distance));
-      commands.push(this.__addFeedItemSender(connection.target, itemID, senderID));
-      if (prevSenderID) commands.push(this.__addFeedItemWithScore(connection.target, itemID, connection.distance));
+      commands.pushArray(this.__addFeedItemCommands(connection.target, feedItem));
     }
+    console.log(commands);
     client.multi(commands).exec(callback);
   }
 };
