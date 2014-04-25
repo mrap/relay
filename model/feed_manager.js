@@ -41,8 +41,26 @@ var FeedManager = {
 
   __addFeedItemCommands: function(userID, feedItem){
     return [ this.__addFeedItemScore(userID, feedItem),
-             this.__addFeedItem(userID, feedItem),
-             this.__incrFeedItemDistance(userID, feedItem)];
+             this.__addFeedItem(userID, feedItem)];
+  },
+
+  /**
+   * Gets the item
+   * updates it's distance value if the previous value is greater
+   */
+  updateFeedItemDistance: function(userID, feedItem, callback){
+    userID = getObjectID(userID);
+    var dist = feedItem.originDistance;
+    var key = this.userFeedItemKey(userID, feedItem.postID);
+    client.hget(key, "origin_dist", function(err, reply){
+      if (err) return callback(err, null);
+      var prevDist = reply || Number.POSITIVE_INFINITY;
+      if (prevDist <= dist) return callback(null, prevDist);
+      client.hset(key, "origin_dist", dist, function(err, reply){
+        if (err) return callback(err, null);
+        callback(null, dist);
+      });
+    });
   },
 
   userFeedKey: function(userID){
@@ -76,13 +94,26 @@ var FeedManager = {
   // 2. Store senderID and prevSenderID in hash
   //    user:userID:feeditem  => { origin : senderID, prev: prevSenderID }
   sendItemToConnections: function(feedItem, connections, callback){
+    var self = this;
     var count = connections.length;
     var commands = [];
     for(var i=count-1; i>=0; i--){
       var connection = connections[i];
       commands.pushArray(this.__addFeedItemCommands(connection.target, feedItem));
     }
-    client.multi(commands).exec(callback);
+    client.multi(commands).exec(function(err, res){
+      if (err) return callback(err, null);
+
+      function updateAnother(current){
+        if (current >= count) return callback(null, count);
+        var connection = connections[current];
+        self.updateFeedItemDistance(connection.target, feedItem, function(err, dist){
+          if (err) return callback(err, null);
+          return updateAnother(current+1);
+        });
+      }
+      return updateAnother(0);
+    });
   }
 };
 

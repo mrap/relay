@@ -4,7 +4,7 @@ var FeedItem = function FeedItem(attrs){
   this.senderID       = attrs.senderID       || null;
   this.prevSenderID   = attrs.prevSenderID   || null;
   this.score          = attrs.score          || 0;
-  this.originDistance = attrs.originDistance || 0;
+  this.originDistance = attrs.originDistance || 1;
 
   // Convert to numbers
   this.score          = Number(this.score);

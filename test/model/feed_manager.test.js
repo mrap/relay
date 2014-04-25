@@ -64,7 +64,7 @@ describe("Feed Manager", function(){
           if (err) done(err);
           expect(item.postID.toString()).to.eq(feedItem.postID.toString());
           expect(item.senderID.toString()).to.eq(feedItem.senderID.toString());
-          expect(item.originDistance).to.eq(feedItem.originDistance+1);
+          expect(item.originDistance).to.eq(feedItem.originDistance);
           done();
         });
       });
