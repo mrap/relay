@@ -28,14 +28,20 @@ var FeedManager = {
   __addFeedItem: function(userID, feedItem){
     var hash = {};
     // Check to avoid storing null values (wastes space)
-    if (feedItem.originDistance) hash["origin_dist"] = hash.originDistance;
-    if (feedItem.sender)         hash["sender"]      = hash.sender;
-    if (feedItem.prevSenderID)   hash["prev_sender"] = hash.prevSenderID;
+    if (feedItem.senderID)      hash["sender"]      = feedItem.senderID;
+    if (feedItem.prevSenderID)  hash["prev_sender"] = feedItem.prevSenderID;
     return ["hmset", this.userFeedItemKey(userID, feedItem.postID), hash];
   },
 
+  __incrFeedItemDistance: function(userID, feedItem){
+    var distance = feedItem.originDistance+1;
+    return ["hincrby", this.userFeedItemKey(userID, feedItem.postID), "origin_dist", distance];
+  },
+
   __addFeedItemCommands: function(userID, feedItem){
-    return [ this.__addFeedItemScore(userID, feedItem), this.__addFeedItem(userID, feedItem)];
+    return [ this.__addFeedItemScore(userID, feedItem),
+             this.__addFeedItem(userID, feedItem),
+             this.__incrFeedItemDistance(userID, feedItem)];
   },
 
   userFeedKey: function(userID){

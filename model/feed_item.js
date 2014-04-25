@@ -4,7 +4,7 @@ var FeedItem = function FeedItem(attrs){
   this.postID         = attrs.postID;
   this.senderID       = attrs.senderID;
   this.prevSenderID   = attrs.prevSenderID;
-  this.originDistance = attrs.originDistance || 1;
+  this.originDistance = attrs.originDistance || 0;
   return this;
 };
 
