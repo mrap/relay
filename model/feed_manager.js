@@ -26,12 +26,12 @@ var FeedManager = {
   },
 
   __addFeedItem: function(userID, feedItem){
-    var feedItemHash = {
-      "sender"      : feedItem.senderID,
-      "origin_dist" : feedItem.originDistance
-    };
-    if (feedItem.prevSenderID) feedItemHash["prev_sender"] = feedItem.prevSenderID;
-    return ["hmset", this.userFeedItemKey(userID, feedItem.postID), feedItemHash];
+    var hash = {};
+    // Check to avoid storing null values (wastes space)
+    if (feedItem.originDistance) hash["origin_dist"] = hash.originDistance;
+    if (feedItem.sender)         hash["sender"]      = hash.sender;
+    if (feedItem.prevSenderID)   hash["prev_sender"] = hash.prevSenderID;
+    return ["hmset", this.userFeedItemKey(userID, feedItem.postID), hash];
   },
 
   __addFeedItemCommands: function(userID, feedItem){
@@ -61,7 +61,6 @@ var FeedManager = {
       var connection = connections[i];
       commands.pushArray(this.__addFeedItemCommands(connection.target, feedItem));
     }
-    console.log(commands);
     client.multi(commands).exec(callback);
   }
 };
