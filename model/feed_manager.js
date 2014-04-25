@@ -1,20 +1,14 @@
 var redis    = require('redis')
   , client   = redis.createClient()
   , key      = require('./redis_key')
-  , FeedItem = require('./feed_item');
+  , FeedItem = require('./feed_item')
+  , getObjectID = require('../lib/global_helpers').getObjectID;
 
 // Redis fields
 var FIELD = {
   SENDER : "sender",
   PREV_SENDER : "prev_sender",
   ORIGIN_DIST : "origin_dist"
-};
-
-var getObjectID = function(obj){
-  if      (obj === null) return null;
-  else if (obj.constructor.name === 'ObjectID') return obj;
-  else if (obj._id.constructor.name === 'ObjectID') return obj._id;
-  else    return null;
 };
 
 var FeedManager = {
