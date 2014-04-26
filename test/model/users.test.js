@@ -69,41 +69,48 @@ describe("User Model", function(){
   })
 
   describe("connecting users", function(){
-    var user1  = null;
-    var user2  = null;
-    var dist   = 10;
-    var result = null;
+    // user is connected to connUser
+    // user is not connected to notConnUser
+    var connUser    = null;
+    var notConnUser = null;
+    var connection  = null;
+    var dist        = 10;
     beforeEach(function(done){
-      Factory.createList('User', 2, function(err, users){
+      Factory.createList('User', 3, function(err, users){
         if (err) return done(err);
-        user1 = users[0];
-        user2 = users[1];
+        user        = users[0];
+        connUser    = users[1];
+        notConnUser = users[2];
         done();
       });
     });
+
     var testUsersConnected = function(){
       it("should create a connection for both users", function(done){
-        user1.getConnectionsCount(function(err, count){
+        user.getConnectionsCount(function(err, count){
           expect(count).to.eq(1);
-          user2.getConnectionsCount(function(err, count){
+          connUser.getConnectionsCount(function(err, count){
             expect(count).to.eq(1);
-            done();
+            notConnUser.getConnectionsCount(function(err, count){
+              expect(count).to.eq(0);
+              done();
+            });
           });
         });
       });
 
       it("should return the connection", function(){
-        result.origin.should.eq(user1._id);
-        result.target.should.eq(user2._id);
-        result.distance.should.eq(dist);
+        connection.origin.should.eq(user._id);
+        connection.target.should.eq(connUser._id);
+        connection.distance.should.eq(dist);
       });
     };
 
     describe("User#connectUsers", function(){
       beforeEach(function(done){
-        User.connectUsers(user1, user2, dist, function(err, res){
+        User.connectUsers(user, connUser, dist, function(err, res){
           if (err) return done(err);
-          result = res;
+          connection = res;
           done();
         });
       });
@@ -111,21 +118,37 @@ describe("User Model", function(){
       testUsersConnected();
 
       describe("getting user's connections", function(){
-        var user3 = null;
-        beforeEach(function(done){
-          Factory.create('User', function(err, u){
-            if (err) return done(err);
-            user3 = u;
-            user1.connectWithUser(dist, user3, function(err, connection){
+        describe("#getConnection", function(){
+          it("should return array of connections with _ids", function(done){
+            user.getConnections(function(err, connections){
+              var first = connections[0];
+              first.target.toString().should.eq(connection.target.toString());
               done();
             });
           });
         });
-        describe("#getConnection", function(){
-          it("should return array of connections with _ids", function(done){
-            user1.getConnections(function(err, connections){
-              var first = connections[0];
-              first.target.toString().should.eq(result.target.toString());
+
+        describe("#getDistanceToUser", function(){
+          beforeEach(function(done){
+            Factory.create('User', function(err, res){
+              if (err) return done(err);
+              notConnUser = res;
+              done();
+            });
+          });
+
+          it("should return the correct distance to a connected user", function(done){
+            user.getDistanceToUser(connUser, function(err, res){
+              if (err) return done(err);
+              res.should.eq(dist);
+              done();
+            });
+          });
+
+          it("should return -1 if not connected to user", function(done){
+            user.getDistanceToUser(notConnUser, function(err, res){
+              if (err) return done(err);
+              res.should.eq(-1);
               done();
             });
           });
@@ -133,10 +156,10 @@ describe("User Model", function(){
 
         describe("User#getConnectedUsers", function(){
           it("should return array of connections with User objects", function(done){
-            User.getConnectedUsers(user1, function(err, connections){
+            User.getConnectedUsers(user, function(err, connections){
               var first = connections[0];
-              connections.containsUser(user2).should.be.true;
-              connections.containsUser(user3).should.be.true;
+              connections.containsUser(connUser).should.be.true;
+              connections.containsUser(notConnUser).should.be.false;
               done();
             });
           });

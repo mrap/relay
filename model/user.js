@@ -86,6 +86,10 @@ userSchema.methods.getConnections = function(callback){
   UserConnectionManager.getUserConnections(this, callback);
 };
 
+userSchema.methods.getDistanceToUser = function(other, callback){
+  UserConnectionManager.getDistanceBetweenUsers(this, other, callback);
+};
+
 userSchema.methods.relayOwnPost = function(post, callback){
   var user = this;
   user.getConnections(function(err, connections){

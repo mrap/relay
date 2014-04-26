@@ -40,6 +40,20 @@ var UserConnectionManager = {
   },
 
   /**
+   * Returns the connection distance between two users.
+   * If they are not connected, callback returns -1.
+   */
+  getDistanceBetweenUsers: function(user1, user2, callback){
+    if (typeof callback !== 'function') return callback(new Error("3rd param must be a callback function"), null);
+    var uid2 = getObjectID(user2);
+    client.zscore(this.userConnectionsKey(user1), uid2, function(err, res){
+      if (err) return callback(err, null);
+      res = Number(res) || -1; 
+      callback(null, res);
+    });
+  },
+
+  /**
    * Returns an array of user's connections.
    */
   getUserConnections: function(user, callback){
