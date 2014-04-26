@@ -3,7 +3,7 @@ var UserConnection = require('./user_connection')
   , client         = redis.createClient()
   , helpers        = require('../lib/global_helpers.js')
   , getObjectID    = helpers.getObjectID
-  , eqUsers        = helpers.eqUsers;
+  , eqObjectIDs    = helpers.eqObjectIDs;
 
 var USERS_NOT_CONNECTED = -1;
 var MIN_DISTANCE        = 1;
@@ -111,7 +111,7 @@ var UserConnectionManager = {
    */
   intimateUsers: function(user1, user2, callback){
     var self = this;
-    if (eqUsers(user1, user2)) return callback(new Error("Can't intimate the user to itself."), null);
+    if (eqObjectIDs(user1, user2)) return callback(new Error("Can't intimate the user to itself."), null);
     var uid1 = getObjectID(user1)
       , uid2 = getObjectID(user2);
 

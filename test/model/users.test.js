@@ -2,7 +2,7 @@ var should            = require('chai').should()
   , expect            = require('chai').expect
   , Factory           = require('../factories')
   , User              = require('mongoose').model('User')
-  , arrayContainsUser = require('../../lib/global_helpers').arrayContainsUser;
+  , containsObject    = require('../../lib/global_helpers').containsObject;
 
 describe("User Model", function(){
   var user = null;
@@ -159,8 +159,8 @@ describe("User Model", function(){
           it("should return array of connections with User objects", function(done){
             User.getConnectedUsers(user, function(err, connections){
               var first = connections[0];
-              arrayContainsUser(connections, connUser).should.be.true;
-              arrayContainsUser(connections, notConnUser).should.be.false;
+              containsObject(connections, connUser).should.be.true;
+              containsObject(connections, notConnUser).should.be.false;
               done();
             });
           });
