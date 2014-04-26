@@ -1,11 +1,9 @@
-var mongoose = require('mongoose');
+var mongoose    = require('mongoose')
+  , getObjectID = require('../lib/global_helpers.js').getObjectID;
 
 var UserConnection = function UserConnection(origin, target, distance){
-  if (origin.constructor.name != target.constructor.name)
-    throw new Error("connection origin and target must be of the same type");
-
-  this.origin = origin;
-  this.target = target;
+  this.origin = getObjectID(origin);
+  this.target = getObjectID(target);
   this.distance = distance;
 };
 

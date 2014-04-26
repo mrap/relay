@@ -101,6 +101,19 @@ userSchema.methods.relayOwnPost = function(post, callback){
   });
 };
 
+userSchema.methods.relayOtherPost = function(post, callback){
+  var user = this;
+  user.getConnections(function(err, connections){
+    if (err) return callback(err, null);
+
+    // 1. Send post to connections
+    FeedManager.sendExistingPostToConnections(user, post, connections, function(err, res){
+      if (err) return callback(err, null);
+      callback(null, res);
+    });
+  });
+};
+
 /***** Static Model Methods *****/
 userSchema.statics.connectUsers = function(user1, user2, distance, callback){
   UserConnectionManager.connectUsers(user1, user2, distance, callback);
@@ -111,8 +124,7 @@ userSchema.statics.getConnectedUsers = function(user, callback){
   user.getConnections(function(err, connections){
     // Extract an array of the connected user's ids
     var ids  = new Array();
-    for(var i = 0; i < connections.length; i++)
-    ids.push(connections[i].target);
+    for(var i = 0; i < connections.length; i++) ids.push(connections[i].target);
     model.find({'_id': {'$in': ids}}, function(err, res){
       if (err) throw err;
       callback(null, res);

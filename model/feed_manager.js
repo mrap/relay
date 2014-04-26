@@ -1,8 +1,9 @@
-var redis    = require('redis')
-  , client   = redis.createClient()
-  , key      = require('./redis_key')
-  , FeedItem = require('./feed_item')
-  , getObjectID = require('../lib/global_helpers').getObjectID;
+var redis                 = require('redis')
+  , client                = redis.createClient()
+  , key                   = require('./redis_key')
+  , FeedItem              = require('./feed_item')
+  , getObjectID           = require('../lib/global_helpers').getObjectID
+  , UserConnectionManager = require('./user_connection_manager');
 
 // Redis fields
 var FIELD = {
@@ -81,7 +82,8 @@ var FeedManager = {
     userID = getObjectID(userID);
     postID = getObjectID(postID);
     client.hgetall(this.userFeedItemKey(userID, postID), function(err, res){
-      if (err) return callback(err, null);
+      if (err)  return callback(err, null);
+      if (!res) return callback(null, null);
       var feedItem = new FeedItem({
           postID         : postID,
           senderID       : res.sender,
@@ -123,6 +125,43 @@ var FeedManager = {
       senderID       : getObjectID(sender)
     });
     this.sendItemToConnections(feedItem, connections, callback);
+  },
+
+  sendExistingPostToConnections: function(user, post, connections, callback){
+    var self = this;
+    // Get post's feedItem from user's feed
+    // Configure a new feedItem to send to connections
+    self.getUserFeedItem(user, post, function(err, prevItem){
+      if (err) return callback(err, null);
+      // If no item exists, user doesn't have the post in their feed, short circuit
+      if (!prevItem) return callback(new Error("User does not have post in their feed!"), null);
+      var feedItem = new FeedItem({
+        postID         : getObjectID(post),
+        senderID       : getObjectID(user),
+        prevSenderID   : prevItem.senderID,
+        originDistance : prevItem.originDistance+1
+      });
+
+      // 1. Send item to connections
+      self.sendItemToConnections(feedItem, connections, function(err, res){
+        if (err) return callback(err, null);
+
+        // 2. Connect user to prevSender of prevItem
+        // Dist = distTo sender + dist between sender and prevSender
+        var sender = prevItem.senderID;
+        var prevSender = prevItem.prevSenderID;
+        UserConnectionManager.getDistanceBetweenUsers(user, sender, function(err, distToSender){
+          UserConnectionManager.getDistanceBetweenUsers(sender, prevSender, function(err, distSenderToPrevSender){
+            var dist = distToSender + distSenderToPrevSender;
+            UserConnectionManager.connectUsers(user, prevSender, dist, function(err, res){
+
+              // 3. Intimate connection between user and sender
+              UserConnectionManager.intimateUsers(user, sender, callback);
+            });
+          });
+        });
+      });
+    });
   }
 };
 
