@@ -6,7 +6,8 @@ var mongoose = require('mongoose')
 
 monky.factory('User', {
   email:    'user#n@email.com',
-  password: "very secure password"
+  password: "very secure password",
+  username: "username#n"
 },
 function(err){
   if (err) throw err;

@@ -26,6 +26,7 @@ var matchesHash = function(data, hash, callback){
 var userSchema = Schema({
   posts     : [{type: Schema.Types.ObjectId, ref: 'Post'}],
   email     : { type: String, required: true, unique: true},
+  username  : { type: String, required: true, unique: true},
   password  : { type: String, required: true }
 });
 
