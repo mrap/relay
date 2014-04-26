@@ -101,7 +101,7 @@ var FeedManager = {
     // Builds a multi redis transaction for each connection.
     for(var i=count-1; i>=0; i--){
       var connection = connections[i];
-      commands.pushArray(this.__addFeedItemCommands(connection.target, feedItem));
+      commands = commands.concat(this.__addFeedItemCommands(connection.target, feedItem));
     } client.multi(commands).exec(function(err, res) {
       if (err) return callback(err, null);
 
