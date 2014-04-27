@@ -1,6 +1,6 @@
 var Factory         = require('../factories')
   , mongoose        = require('mongoose')
-  , Post            = mongoose.model('Post')
+  , PostFixture     = require('../fixtures/posts.fixture')
   , helper          = require('../../lib/global_helpers')
   , containsObject  = helper.containsObject
   , ActivityManager = require('../../model/activity_manager');
@@ -14,7 +14,7 @@ describe("Activity Manager", function(){
       user = users[0];
       var author = users[1];
       author.connectWithUser(10, user, function(err, res){
-        Post.createPostByUser(author, null, function(err, p){
+        PostFixture.createByUser(null, author, function(err, p){
           if (err) return done(err);
           post = p;
           user.relayOtherPost(post, done);

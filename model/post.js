@@ -13,7 +13,7 @@ var postSchema = Schema({
 var DEFAULT_POST_SCORE = 10;
 
 /***** Static Model Methods *****/
-postSchema.statics.createPostByUser = function(user, attrs, callback){
+postSchema.statics.createByUser = function(attrs, user, callback){
   /*** Save Post ***/
   var newPost = new Post(attrs);
   newPost._author = user;

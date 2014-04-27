@@ -3,6 +3,7 @@ var chai        = require('chai'),
     expect      = chai.expect,
     Factory     = require('../factories'),
     UserFixture = require('../fixtures/users.fixture'),
+    PostFixture = require('../fixtures/posts.fixture'),
     mongoose    = require('mongoose'),
     Post        = mongoose.model('Post'),
     User        = mongoose.model('User');
@@ -16,7 +17,7 @@ describe("Post Model", function(){
       Factory.create('User', function(err, u){
         if (err) return done(err);
         user = u;
-        Post.createPostByUser(user, null, function(err, p){
+        PostFixture.createByUser(null, user, function(err, p){
           if (err) return done(err);
           post = p;
           done();
@@ -34,7 +35,7 @@ describe("Post Model", function(){
       UserFixture.createUserWithConnections(3, 10, null, function(err, res){
         if (err) return done(err);
         user = res;
-        Post.createPostByUser(user, null,function(err, p){
+        PostFixture.createByUser(null, user, function(err, p){
           post = p;
           done();
         });
