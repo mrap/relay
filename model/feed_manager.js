@@ -57,6 +57,7 @@ var FeedManager = {
   },
 
   userFeedKey: function(userID){
+    userID = getObjectID(userID);
     return key.keyIDAttribute("user", userID.toString(), "feeditems" );
   },
 
@@ -69,8 +70,12 @@ var FeedManager = {
   },
 
   getUserFeedPosts: function(user, withScores, callback){
-    var userID = getObjectID(user);
-    var args = [this.userFeedKey(userID), 0, -1];
+    var key = this.userFeedKey(user);
+    this.getFeedPostsForKey(key, withScores, callback);
+  },
+
+  getFeedPostsForKey: function(key, withScores, callback){
+    var args = [key, 0, -1];
     if (withScores) args.push('WITHSCORES');
     client.zrange(args, function(err, res){
       if (err) throw err;
