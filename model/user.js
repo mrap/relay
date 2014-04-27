@@ -7,7 +7,8 @@ var redis                 = require('redis')
   , UserConnection        = require('./user_connection')
   , ObjectId              = mongoose.Types.ObjectId
   , bcrypt                = require('bcrypt')
-  , FeedManager           = require('./feed_manager');
+  , FeedManager           = require('./feed_manager')
+  , EventsMonitor         = require('./events_monitor');
 
 /*** Encryption ***/
 var generateHash = function(data, callback){
@@ -96,6 +97,7 @@ userSchema.methods.relayOwnPost = function(post, callback){
     if (err) return callback(err, null);
     FeedManager.sendNewPostToConnections(user, post, connections, function(err, res){
       if (err) return callback(err, null);
+      EventsMonitor.emit("userRelayedPost", null, user, post);
       callback(null, res);
     });
   });
@@ -109,6 +111,7 @@ userSchema.methods.relayOtherPost = function(post, callback){
     // 1. Send post to connections
     FeedManager.sendExistingPostToConnections(user, post, connections, function(err, res){
       if (err) return callback(err, null);
+      EventsMonitor.emit("userRelayedPost", null, user, post);
       callback(null, res);
     });
   });
