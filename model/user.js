@@ -144,7 +144,7 @@ userSchema.statics.feedKeyForID = function(id){
  * callback returns (error, post, user)
  */
 userSchema.statics.addPost = function(id, post, callback){
-  User.findById(id, function(err, user){
+  this.findById(id, function(err, user){
     if (err) return callback(err, null, null);
     if (user.posts.indexOf(post._id) !== -1) return callback(new Error("User already has post: " + post), null, null);
     user.posts.push(post._id);
