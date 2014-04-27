@@ -28,5 +28,13 @@ postSchema.statics.createPostByUser = function(user, attrs, callback){
   return newPost;
 };
 
+postSchema.statics.findByIds = function(ids, next){
+  if (ids.length === 0) return next(null, []);
+  this.find({'_id': {'$in': ids}}, function(err, res){
+    if (err) throw err;
+    next(null, res);
+  });
+};
+
 var Post = mongoose.model('Post', postSchema);
 
