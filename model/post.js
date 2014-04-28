@@ -23,20 +23,19 @@ postSchema.statics.createByUser = function(attrs, user, callback){
     /*** Add to Author's posts ***/
     User.addPost(user, newPost, function(err, post, user){
       if (err) return callback(err, null);
-      EventsMonitor.emit("userCreatedPost", user, post);
       callback(null, post);
     });
   });
   return newPost;
 };
 
-postSchema.statics.findByIds = function(ids, next){
+postSchema.statics.findByIds = function(ids, options, next){
+  var Post = this;
   if (!ids || ids.length === 0) return next(null, []);
-  this.find({'_id': {'$in': ids}}, function(err, res){
-    if (err) throw err;
-    next(null, res);
-  });
+  var query = Post.find({'_id': {'$in': ids}});
+  if (options.WITH_AUTHOR) query.populate('_author');
+  query.exec(next);
 };
 
-var Post = mongoose.model('Post', postSchema);
+mongoose.model('Post', postSchema);
 

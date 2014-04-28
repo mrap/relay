@@ -6,18 +6,18 @@ var client       = require('./redis_client')
   , KEYS         = require('./events_monitor').KEYS;
 
 var ActivityManager = {
-  getTopLatestPosts: function(first, last, next){
-    var offset = first;
-    var count  = first + last;
-    var args = [KEYS.TOP_LATEST_POSTS, '+inf', '-inf', 'LIMIT', offset, count];
-    client.zrevrangebyscore(args, function(err, postIds){
+  getPopularPosts: function(first, last, next){
+    var startIndex = first;
+    var endIndex   = first + last;
+    var args = [KEYS.TOP_LATEST_POSTS, first, endIndex];
+    client.zrevrange(args, function(err, postIds){
       if (err) return next(err, null);
       var i = postIds.length;
       while(i--) {
         if (postIds[i] === 'null') postIds.splice(i, 1);
         else postIds[i] = getObjectID(postIds[i]);
       }
-      Post.findByIds(postIds, next);
+      Post.findByIds(postIds, {WITH_AUTHOR: true}, next);
     });
   }
 };

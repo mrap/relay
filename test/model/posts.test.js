@@ -6,7 +6,11 @@ var chai        = require('chai'),
     PostFixture = require('../fixtures/posts.fixture'),
     mongoose    = require('mongoose'),
     Post        = mongoose.model('Post'),
-    User        = mongoose.model('User');
+    User        = mongoose.model('User'),
+    helper      = require('../../lib/global_helpers'),
+    getObjectID = helper.getObjectID,
+    containsObject = helper.containsObject;
+    
 
 describe("Post Model", function(){
   var post = null;
@@ -69,4 +73,30 @@ describe("Post Model", function(){
       });
     });
   })
+
+  describe("#findByIds", function(){
+    var postIds = null;
+    beforeEach(function(done){
+      Factory.create('User', function(err, u){
+        user = u;
+        PostFixture.createByUser(null, user, function(err, p1){
+          PostFixture.createByUser(null, user, function(err, p2){
+            postIds = [getObjectID(p1), getObjectID(p2)];
+            done();
+          });
+        });
+      });
+    });
+
+    describe("option: WITH_AUTHOR", function(){
+      it("should return the full author object too", function(done){
+        Post.findByIds(postIds, {WITH_AUTHOR: true}, function(err, posts){
+          if (err) return done(err);
+          containsObject(postIds, posts[0]);
+          containsObject(postIds, posts[1]);
+          done();
+        });
+      });
+    });
+  });
 })

@@ -17,15 +17,27 @@ describe("Activity Manager", function(){
         PostFixture.createByUser(null, author, function(err, p){
           if (err) return done(err);
           post = p;
-          user.relayOtherPost(post, done);
+          done();
         });
       });
     });
   });
 
   describe("When a user relays a post", function(){
+    beforeEach(function(done){
+      user.relayOtherPost(post, done);
+    });
     it("should add post to `top latest` feed", function(done){
-      ActivityManager.getTopLatestPosts(0, 10, function(err, posts){
+      ActivityManager.getPopularPosts(0, 10, function(err, posts){
+        containsObject(posts, post).should.be.true;
+        done();
+      });
+    });
+  });
+
+  describe("When a user creates a post", function(){
+    it("should add post to `top latest` feed", function(done){
+      ActivityManager.getPopularPosts(0, 10, function(err, posts){
         containsObject(posts, post).should.be.true;
         done();
       });
