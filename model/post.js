@@ -14,7 +14,7 @@ var DEFAULT_POST_SCORE = 10;
 /***** Static Model Methods *****/
 postSchema.statics.createByUser = function(attrs, user, callback){
   /*** Save Post ***/
-  var newPost = new Post(attrs);
+  var newPost = new this(attrs);
   newPost._author = user;
   newPost.save(function(err){
     if (err) return callback(err, null);
@@ -28,7 +28,7 @@ postSchema.statics.createByUser = function(attrs, user, callback){
 };
 
 postSchema.statics.findByIds = function(ids, next){
-  if (ids.length === 0) return next(null, []);
+  if (!ids || ids.length === 0) return next(null, []);
   this.find({'_id': {'$in': ids}}, function(err, res){
     if (err) throw err;
     next(null, res);
