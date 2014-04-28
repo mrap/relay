@@ -1,8 +1,9 @@
-var mongoose  = require('mongoose')
-  , ObjectId  = mongoose.Types.ObjectId
-  , Schema    = mongoose.Schema
-  , redis_key = require('./redis_key')
-  , User      = require('mongoose').model('User');
+var mongoose      = require('mongoose')
+  , ObjectId      = mongoose.Types.ObjectId
+  , Schema        = mongoose.Schema
+  , redis_key     = require('./redis_key')
+  , User          = require('mongoose').model('User')
+  , EventsMonitor = require('./events_monitor');
 
 var postSchema = Schema({
   _author: {type: Schema.Types.ObjectId, ref: 'User', required: true}
@@ -21,6 +22,7 @@ postSchema.statics.createByUser = function(attrs, user, callback){
     /*** Add to Author's posts ***/
     User.addPost(user, newPost, function(err, post, user){
       if (err) return callback(err, null);
+      EventsMonitor.emit("userCreatedPost", user, post);
       callback(null, post);
     });
   });
