@@ -6,7 +6,8 @@ var mongoose      = require('mongoose')
   , EventsMonitor = require('./events_monitor');
 
 var postSchema = Schema({
-  _author: {type: Schema.Types.ObjectId, ref: 'User', required: true}
+  _author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  content: { type: String }
 });
 
 // Note: Temp const.  This will change later in the project.
