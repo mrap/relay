@@ -1,5 +1,4 @@
-var redis        = require('redis')
-  , client       = redis.createClient()
+var client       = require('./redis_client')
   , helper       = require('../lib/global_helpers')
   , getObjectID  = helper.getObjectID
   , mongoose     = require('mongoose')

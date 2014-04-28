@@ -1,7 +1,6 @@
 var mongoose  = require('mongoose')
   , ObjectId  = mongoose.Types.ObjectId
   , Schema    = mongoose.Schema
-  , client    = require('redis').createClient()
   , redis_key = require('./redis_key')
   , User      = require('mongoose').model('User');
 

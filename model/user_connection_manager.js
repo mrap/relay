@@ -1,6 +1,5 @@
 var UserConnection = require('./user_connection')
-  , redis          = require('redis')
-  , client         = redis.createClient()
+  , client         = require('./redis_client')
   , helpers        = require('../lib/global_helpers.js')
   , getObjectID    = helpers.getObjectID
   , eqObjectIDs    = helpers.eqObjectIDs;

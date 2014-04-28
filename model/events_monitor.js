@@ -1,5 +1,4 @@
-var redis        = require('redis')
-  , client       = redis.createClient()
+var client       = require('./redis_client')
   , util         = require('util')
   , EventEmitter = require('events').EventEmitter
   , helper       = require('../lib/global_helpers')

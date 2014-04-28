@@ -1,5 +1,4 @@
-var redis                 = require('redis')
-  , client                = redis.createClient()
+var client                = require('./redis_client')
   , key                   = require('./redis_key')
   , FeedItem              = require('./feed_item')
   , getObjectID           = require('../lib/global_helpers').getObjectID

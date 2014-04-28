@@ -1,6 +1,4 @@
-var redis                 = require('redis')
-  , client                = redis.createClient()
-  , key                   = require('./redis_key')
+var key                   = require('./redis_key')
   , mongoose              = require('mongoose')
   , Schema                = mongoose.Schema
   , UserConnectionManager = require('./user_connection_manager')
