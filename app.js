@@ -1,20 +1,21 @@
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 require('./lib/global_helpers');
 
-var db           = require('./model/db.js')
-  , express      = require('express')
+var express      = require('express')
   , path         = require('path')
   , favicon      = require('static-favicon')
   , logger       = require('morgan')
   , cookieParser = require('cookie-parser')
-  , bodyParser   = require('body-parser');
+  , bodyParser   = require('body-parser')
+  , db           = require('./model/db');
 
-// Configure Environment
-var env = process.env.NODE_ENV || 'development';
+// Configure App
+var app = express();
+app.set('env', process.env.NODE_ENV);
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,6 +38,7 @@ app.use(function(req, res, next) {
     err.status = 404;
     next(err);
 });
+
 
 /// error handlers
 

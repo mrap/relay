@@ -1,17 +1,14 @@
-var mongoose = require('mongoose');
-var env = process.env.NODE_ENV
-var db = mongoose.connection
+var mongoose = require('mongoose')
+  , User     = require('./user')
+  , Post     = require('./post')
+  , db = mongoose.connection
+  , env = process.env.NODE_ENV;
+
+var uri = 'mongodb://localhost/relay_dev';
+if (env === 'test') uri = 'mongodb://localhost/relay_test';
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(){
-  console.log("Connected to MongoDB");
-  require('./user');
-  require('./post');
+  console.log("Connected to MongoDB@%s", uri);
 });
-
-if (env == 'development') mongoose.connect('mongodb://localhost/relay_dev')
-if (env == 'test') {
-  // Clean models and schemas
-  // mongoose.createConnection('mongodb://localhost/relay_test')
-  mongoose.connect('mongodb://localhost/relay_test');
-}
+mongoose.connect(uri);
