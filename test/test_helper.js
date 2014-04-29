@@ -11,11 +11,11 @@ before(function(done){
   Post                  = mongoose.model('Post');
   FeedManager           = require('../model/feed_manager');
   FeedItem              = require('../model/feed_item');
-  ActivityManager       = require('../model/activity_manager');
   UserConnectionManager = require('../model/user_connection_manager');
   helpers               = require('../lib/global_helpers');
   getObjectID           = helpers.getObjectID;
   containsObject        = helpers.containsObject;
+  eqObjectIDs           = helpers.eqObjectIDs;
   PostFixture           = require('./fixtures/posts.fixture');
   UserFixture           = require('./fixtures/users.fixture');
   ScenarioFixture       = require('./fixtures/scenarios.fixture');

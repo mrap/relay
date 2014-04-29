@@ -47,6 +47,42 @@ describe("Post Model", function(){
     });
   })
 
+  it("should add post to `popular posts`", function(done){
+    Post.getPopularPosts(0, 10, function(err, posts){
+      containsObject(posts, post).should.be.true;
+      done();
+    });
+  });
+  
+  describe("when a post is relayed", function(){
+    var relayer = null;
+    beforeEach(function(done){
+      Factory.create('User', function(err, u){
+        relayer = u;
+        user.connectWithUser(10, relayer, function(err, res){
+          PostFixture.createByUser(null, user, function(err, p){
+            post = p;
+            relayer.relayOtherPost(post, done);
+          });
+        });
+      });
+    });
+
+    it("should add post to `popular` feed", function(done){
+      Post.getPopularPosts(0, 10, function(err, posts){
+        containsObject(posts, post).should.be.true;
+        done();
+      });
+    });
+
+    it("should update post `last relayed by`", function(done){
+      post.getLastRelayer(function(err, res){
+        eqObjectIDs(res, relayer).should.be.true;
+        done();
+      });
+    });
+  });
+
   describe("#findByIds", function(){
     var postIds = null;
     beforeEach(function(done){
