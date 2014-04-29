@@ -18,7 +18,7 @@ before(function(done){
   containsObject        = helpers.containsObject;
   PostFixture           = require('./fixtures/posts.fixture');
   UserFixture           = require('./fixtures/users.fixture');
-  ScenarioFixture = require('./fixtures/scenarios.fixture');
+  ScenarioFixture       = require('./fixtures/scenarios.fixture');
   Factory               = require('./factories');
 
   process.env.NODE_ENV = 'test';
