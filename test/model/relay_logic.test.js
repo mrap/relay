@@ -1,10 +1,3 @@
-var UserFixture = require('../fixtures/users.fixture')
-  , mongoose    = require('mongoose')
-  , User        = mongoose.model('User')
-  , PostFixture = require('../fixtures/posts.fixture')
-  , Factory     = require('../factories')
-  , UserConnectionManager = require('../../model/user_connection_manager');
-
 describe("Relay Logic", function(){
 
   /*** Setup ***/

@@ -1,9 +1,3 @@
-var should            = require('chai').should()
-  , expect            = require('chai').expect
-  , Factory           = require('../factories')
-  , User              = require('mongoose').model('User')
-  , containsObject    = require('../../lib/global_helpers').containsObject;
-
 describe("User Model", function(){
   var user = null;
   describe("building a user instance", function(){

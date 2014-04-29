@@ -1,10 +1,3 @@
-var Factory         = require('../factories')
-  , mongoose        = require('mongoose')
-  , PostFixture     = require('../fixtures/posts.fixture')
-  , helper          = require('../../lib/global_helpers')
-  , containsObject  = helper.containsObject
-  , ActivityManager = require('../../model/activity_manager');
-
 describe("Activity Manager", function(){
   var user = null
     , post = null;

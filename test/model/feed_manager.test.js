@@ -1,13 +1,3 @@
-var FeedManager = require('../../model/feed_manager')
-  , Factory     = require('../factories')
-  , UserFixture = require('../fixtures/users.fixture')
-  , mongoose    = require('mongoose')
-  , User        = mongoose.model('User')
-  , Post        = mongoose.model('Post')
-  , expect      = require('chai').expect
-  , FeedItem    = require('../../model/feed_item');
-
-
 describe("Feed Manager", function(){
   var user             = null;
   var post             = null;
