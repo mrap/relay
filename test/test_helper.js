@@ -1,9 +1,12 @@
 
 /*** Global Suite Setup and Tear Down ***/
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
+  , client   = require('../model/redis_client');
 
 /*** Setup ***/
 before(function(done){
+  process.env.NODE_ENV  = 'test';
+  app                   = require('../app');
   chai                  = require('chai');
   should                = chai.should();
   expect                = chai.expect;
@@ -20,9 +23,6 @@ before(function(done){
   UserFixture           = require('./fixtures/users.fixture');
   ScenarioFixture       = require('./fixtures/scenarios.fixture');
   Factory               = require('./factories');
-
-  process.env.NODE_ENV = 'test';
-  require('../app');
   done();
 });
 
@@ -31,7 +31,7 @@ beforeEach(function(done){
     if (err && err.message != "ns not found" ) console.error(err);
     mongoose.connection.collections['posts'].drop( function(err) {
       if (err && err.message != "ns not found" ) console.error(err);
-      done();
+      client.flushdb(done);
     });
   });
 });

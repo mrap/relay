@@ -97,12 +97,21 @@ describe("Post Model", function(){
       });
     });
 
+    it("should return the posts", function(done){
+      Post.findByIds(postIds, {}, function(err, posts){
+        if (err) return done(err);
+        containsObject(postIds, posts[0]);
+        containsObject(postIds, posts[1]);
+        done();
+      });
+    });
+
     describe("option: WITH_AUTHOR", function(){
       it("should return the full author object too", function(done){
         Post.findByIds(postIds, {WITH_AUTHOR: true}, function(err, posts){
           if (err) return done(err);
-          containsObject(postIds, posts[0]);
-          containsObject(postIds, posts[1]);
+          var first = posts[0];
+          eqObjectIDs(first._author, user).should.be.true;
           done();
         });
       });
