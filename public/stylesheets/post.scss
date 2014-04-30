@@ -1,0 +1,26 @@
+$feed-indent: 20px;
+
+.post {
+  display: block;
+  margin-bottom: 50px;
+
+  .username {
+    text-transform: uppercase;
+  }
+}
+
+.post-info {
+  margin-left: $feed-indent;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+
+  .created {
+    font-size: 0.8em;
+  }
+}
+
+.post-body {
+  background-color: lightgray;
+  padding: 20px;
+  font-size: 2em;
+}
