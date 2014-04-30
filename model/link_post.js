@@ -7,6 +7,6 @@ var LinkPostSchema = PostSchema.extend({
   link: { type: String, required: true }
 });
 
-mongoose.model('LinkPost', LinkPostSchema);
+mongoose.model('link_post', LinkPostSchema);
 
 module.exports = LinkPostSchema;

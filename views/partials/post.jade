@@ -1,0 +1,7 @@
+.post-info
+  span
+    | {{ post._last_relayed_by.username.toUpperCase() }}
+  |  relayed a post
+  p Created {{ post.relay_count }} users away
+
+.post-body(ng-include="'partials/'+ post._type")

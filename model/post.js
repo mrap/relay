@@ -8,7 +8,13 @@ var mongoose      = require('mongoose')
   , helpers       = require('../lib/global_helpers')
   , getObjectID   = helpers.getObjectID;
 
-var schemaOptions = { toObject: {virtuals: true}, toJSON:{virtuals: true} };
+var schemaOptions = {
+  toObject:         {virtuals: true},
+  toJSON:           {virtuals: true},
+  collection:       'posts',
+  discriminatorKey: '_type'
+};
+
 var postSchema    = Schema({
   _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true, select: false },
   _last_relayed_by: { type: Schema.Types.ObjectId, ref: 'User' },

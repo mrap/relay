@@ -16,7 +16,7 @@ monky.factory('Post', {
   content: "This is content"
 });
 
-monky.factory('LinkPost', {
+monky.factory('link_post', {
   _author: 'User',
   content: "This is content",
   link: "http://awesome-link.com"

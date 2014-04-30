@@ -12,7 +12,7 @@ before(function(done){
   expect                = chai.expect;
   User                  = mongoose.model('User');
   Post                  = mongoose.model('Post');
-  LinkPost              = mongoose.model('LinkPost');
+  LinkPost              = mongoose.model('link_post');
   FeedManager           = require('../model/feed_manager');
   FeedItem              = require('../model/feed_item');
   UserConnectionManager = require('../model/user_connection_manager');
