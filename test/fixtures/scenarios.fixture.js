@@ -19,7 +19,7 @@ module.exports.UserWithConnectionsAndFeed = function(userAttrs, connectionsCount
         user.connectWithUser(current, other, function(err, connection){
           if (err) return next(err, null);
           // Other user create a post
-          PostFixture.createByUser(null, other, function(err, post){
+          PostFixture.createByUserWithType(null, other, 'LinkPost', function(err, post){
             if (err) return next(err, null);
           });
           createConnectedUser(current-1);

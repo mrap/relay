@@ -7,7 +7,7 @@ describe("Post Model", function(){
     UserFixture.createUserWithConnections(3, 10, null, function(err, res){
       if (err) return done(err);
       user = res;
-      PostFixture.createByUser(null, user, function(err, p){
+      PostFixture.createByUserWithType(null, user, null, function(err, p){
         if (err) return done(err);
         post = p;
         done();
@@ -61,7 +61,7 @@ describe("Post Model", function(){
       Factory.create('User', function(err, u){
         relayer = u;
         user.connectWithUser(10, relayer, function(err, res){
-          PostFixture.createByUser(null, user, function(err, p){
+          PostFixture.createByUserWithType(null, user, null, function(err, p){
             post = p;
             relayer.relayOtherPost(post, done);
           });
@@ -96,8 +96,8 @@ describe("Post Model", function(){
     beforeEach(function(done){
       Factory.create('User', function(err, u){
         user = u;
-        PostFixture.createByUser(null, user, function(err, p1){
-          PostFixture.createByUser(null, user, function(err, p2){
+        PostFixture.createByUserWithType(null, user, null, function(err, p1){
+          PostFixture.createByUserWithType(null, user, null, function(err, p2){
             postIds = [getObjectID(p1), getObjectID(p2)];
             done();
           });
@@ -136,7 +136,7 @@ describe("Post Model", function(){
         Factory.create('User', function(err, u){
           relayer = u;
           user.connectWithUser(10, relayer, function(err, res){
-            PostFixture.createByUser(null, user, function(err, p){
+            PostFixture.createByUserWithType(null, user, null, function(err, p){
               post = p;
               postIds = [post._id];
               relayer.relayOtherPost(post, done);

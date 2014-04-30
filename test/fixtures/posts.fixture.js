@@ -3,7 +3,8 @@ var mongoose = require('mongoose')
   , Factory = require('../factories')
 
 var Fixture = {
-  createByUser: function(attrs, user, next){
+  createByUserWithType: function(attrs, user, type, next){
+    type = type || 'Post'
     Factory.build('Post', function(err, postAttrs){
       if (err) return next(err, null);
       if (user) return Post.createByUser(postAttrs, user, next);
@@ -13,6 +14,6 @@ var Fixture = {
       });
     });
   }
-}
+};
 
 module.exports = Fixture;

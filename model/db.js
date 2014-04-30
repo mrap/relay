@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
-  , User     = require('./user')
-  , Post     = require('./post')
+  , UserSchema     = require('./user')
+  , PostSchema     = require('./post')
+  , LinkPostSchema = require('./link_post')
   , db = mongoose.connection
   , env = process.env.NODE_ENV;
 

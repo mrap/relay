@@ -24,7 +24,7 @@ describe("Relay Logic", function(){
             if (err) done(err);
             connUsers = res;
             connUser  = (connUsers[0]._id.toString() !== author._id.toString()) ? connUsers[0] : connUsers[1];
-            PostFixture.createByUser(null, author, function(err, p){
+            PostFixture.createByUserWithType(null, author, null, function(err, p){
               if (err) done(err);
               post = p;
               done();
