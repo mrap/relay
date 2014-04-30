@@ -15,6 +15,14 @@ var postSchema = Schema({
 // Note: Temp const.  This will change later in the project.
 var DEFAULT_POST_SCORE = 10;
 
+postSchema.virtual('last_relayer').set(function(relayer){
+  this._last_relayer = relayer;
+});
+
+postSchema.virtual('last_relayer').get(function(){
+  return this._last_relayer || null;
+});
+
 postSchema.methods.getLastRelayerID = function(next){
   client.HGET(EventsMonitor.keys.post(this), "last_relayed_by", next);
 };
@@ -47,7 +55,11 @@ postSchema.statics.findByIds = function(ids, options, next){
   if (!ids || ids.length === 0) return next(null, []);
   var query = Post.find({'_id': {'$in': ids}});
   if (options.WITH_AUTHOR) query.populate('_author');
-  query.exec(next);
+  query.exec(function(err, posts){
+    if      (err) throw err;
+    else if (options.WITH_LAST_RELAYER) Post.updatePostsWithLastRelayers(posts, next);
+    else    next(err, posts);
+  });
 };
 
 postSchema.statics.getPopularPosts = function(first, last, next){
@@ -66,5 +78,23 @@ postSchema.statics.getPopularPosts = function(first, last, next){
   });
 };
 
+postSchema.statics.updatePostsWithLastRelayers = function(posts, next){
+  var Post = this;
+  if (!posts || posts.length === 0) return next(null, []);
+  var updatedPosts = posts;
+
+  function updateAnother(itr){
+    if (itr === updatedPosts.length) {
+      return next(null, updatedPosts);
+    }
+    var current = updatedPosts[itr];
+    current.getLastRelayer(function(err, res){
+      if (err) throw err;
+      updatedPosts[itr].last_relayer = res;
+      updateAnother(itr+1);
+    });
+  }
+  updateAnother(0);
+};
 mongoose.model('Post', postSchema);
 

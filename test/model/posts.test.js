@@ -116,5 +116,29 @@ describe("Post Model", function(){
         });
       });
     });
+
+    describe("option: WITH_LAST_RELAYER", function(){
+      var relayer = null;
+      beforeEach(function(done){
+        Factory.create('User', function(err, u){
+          relayer = u;
+          user.connectWithUser(10, relayer, function(err, res){
+            PostFixture.createByUser(null, user, function(err, p){
+              post = p;
+              relayer.relayOtherPost(post, done);
+            });
+          });
+        });
+      });
+
+      it("should return the last relayer", function(done){
+        Post.findByIds(postIds, {WITH_LAST_RELAYER: true}, function(err, posts){
+          if (err) return done(err);
+          var first = posts[0];
+          eqObjectIDs(first.last_relayer, relayer);
+          done();
+        });
+      });
+    });
   });
 })
