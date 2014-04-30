@@ -10,5 +10,12 @@ if (env === 'test') uri = 'mongodb://localhost/relay_test';
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(){
   console.log("Connected to MongoDB@%s", uri);
+
+  // Seed development data (if needed)
+  if (env == 'development' && process.env.SEED_DB){
+    process.env.SEED_DB = false;
+    console.log("seedDB");
+    require('../config/seed_db');
+  }
 });
 mongoose.connect(uri);
