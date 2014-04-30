@@ -11,6 +11,7 @@ var mongoose      = require('mongoose')
 var postSchema = Schema({
   _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true },
   _last_relayed_by: { type: Schema.Types.ObjectId, ref: 'User' },
+  relay_count:      { type: Number, default: 0 },
   content:          { type: String }
 });
 

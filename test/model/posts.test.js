@@ -82,6 +82,13 @@ describe("Post Model", function(){
         done();
       });
     });
+
+    it("should update post `relay_count`", function(done){
+      Post.findById(post._id).exec(function(err, res){
+        expect(res.relay_count).to.eq(1);
+        done();
+      });
+    });
   });
 
   describe("#findByIds", function(){
