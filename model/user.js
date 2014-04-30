@@ -112,7 +112,7 @@ userSchema.methods.relayOtherPost = function(post, next){
 
       // 2. Update post's '_last_relayed_by' field
       // TODO: check and handle case where post is a ObjectID
-      post.update({_last_relayed_by: user, $inc: {relay_count: 1} }, next);
+      post.update({_last_relayed_by: user, $inc: {__relay_count: 1} }, next);
       EventsMonitor.emit("userRelayedPost", null, user, post);
     });
   });

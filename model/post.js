@@ -8,15 +8,28 @@ var mongoose      = require('mongoose')
   , helpers       = require('../lib/global_helpers')
   , getObjectID   = helpers.getObjectID;
 
+var schemaOptions = { toObject: {virtuals: true}, toJSON:{virtuals: true} };
 var postSchema = Schema({
   _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true, select: false },
   _last_relayed_by: { type: Schema.Types.ObjectId, ref: 'User' },
-  relay_count:      { type: Number, default: 0, select: false },
+  __relay_count:      { type: Number, default: 0, select: false },
   content:          { type: String }
-});
+}, schemaOptions);
 
 // Note: Temp const.  This will change later in the project.
-var DEFAULT_POST_SCORE = 10;
+var DEFAULT_POST_SCORE = 10
+  , MIN_RELAY_COUNT_FOR_DISPLAY = 2;
+
+// Enables us to set relay_count with __temp_relay_count per instance.
+// Helpful for building individual user feeds.
+postSchema.virtual('relay_count').get(function(){
+  var count = this.__temp_relay_count || this.__relay_count;
+  return (!count || count <= MIN_RELAY_COUNT_FOR_DISPLAY) ? 
+    "<" + MIN_RELAY_COUNT_FOR_DISPLAY :
+    count;
+}).set(function(v){
+  this.__temp_relay_count = v;
+});
 
 /***** Static Model Methods *****/
 postSchema.statics.createByUser = function(attrs, user, callback){

@@ -54,7 +54,7 @@ describe("Post Model", function(){
       done();
     });
   });
-  
+
   describe("when a post is relayed", function(){
     var relayer = null;
     beforeEach(function(done){
@@ -83,9 +83,9 @@ describe("Post Model", function(){
       });
     });
 
-    it("should update post `relay_count`", function(done){
-      Post.findById(post._id).select('+relay_count').exec(function(err, res){
-        expect(res.relay_count).to.eq(1);
+    it("should update post `__relay_count`", function(done){
+      Post.findById(post._id).select('+__relay_count').exec(function(err, res){
+        expect(res.__relay_count).to.eq(1);
         done();
       });
     });
