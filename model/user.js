@@ -26,7 +26,7 @@ var userSchema = Schema({
   posts     : [{type: Schema.Types.ObjectId, ref: 'Post'}],
   email     : { type: String, required: true, unique: true},
   username  : { type: String, required: true, unique: true},
-  password  : { type: String, required: true }
+  password  : { type: String, required: true, select: false }
 });
 
 userSchema.pre('save', function(next){
@@ -116,10 +116,6 @@ userSchema.methods.relayOtherPost = function(post, callback){
 };
 
 /***** Static Model Methods *****/
-userSchema.statics.safeFields = function(){
-  return '-password';
-};
-
 userSchema.statics.connectUsers = function(user1, user2, distance, callback){
   UserConnectionManager.connectUsers(user1, user2, distance, callback);
 };
@@ -141,16 +137,12 @@ userSchema.statics.feedKeyForID = function(id){
   return key.keyIDAttribute("user", id.toString(), "feed" );
 };
 
-userSchema.statics.findByIdJSON = function(id, next){
-  this.findById(id).select(this.safeFields()).exec(next);
-};
-
 /**
  * Adds a post to a user's posts.
  * callback returns (error, post, user)
  */
 userSchema.statics.addPost = function(id, post, callback){
-  this.findById(id, function(err, user){
+  this.findById(id).select('+password').exec( function(err, user){
     if (err) return callback(err, null, null);
     if (user.posts.indexOf(post._id) !== -1) return callback(new Error("User already has post: " + post), null, null);
     user.posts.push(post._id);

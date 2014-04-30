@@ -8,6 +8,7 @@ describe("Post Model", function(){
       if (err) return done(err);
       user = res;
       PostFixture.createByUser(null, user, function(err, p){
+        if (err) return done(err);
         post = p;
         done();
       });

@@ -31,8 +31,7 @@ postSchema.methods.getLastRelayerID = function(next){
 
 postSchema.methods.getLastRelayer = function(next){
   this.getLastRelayerID(function(err, id){
-    if (err) throw err;
-    User.findById(id).select('-password').exec(next);
+    User.findById(id, next);
   });
 };
 
@@ -56,7 +55,7 @@ postSchema.statics.findByIds = function(ids, options, next){
   var Post = this;
   if (!ids || ids.length === 0) return next(null, []);
   var query = Post.find({'_id': {'$in': ids}});
-  if (options.WITH_AUTHOR) query.populate('_author').select(User.safeFields());
+  if (options.WITH_AUTHOR) query.populate('_author');
   query.exec(function(err, posts){
     if      (err) throw err;
     else if (options.WITH_LAST_RELAYER) Post.updatePostsWithLastRelayers(posts, next);
