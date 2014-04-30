@@ -56,7 +56,7 @@ postSchema.statics.getPopularPosts = function(first, last, next){
       if (postIds[i] === 'null') postIds.splice(i, 1);
       else postIds[i] = getObjectID(postIds[i]);
     }
-    Post.findByIds(postIds, {WITH_LAST_RELAYER: true}, next);
+    Post.findByIds(postIds, {WITH_LAST_RELAYED_BY: true}, next);
   });
 };
 
