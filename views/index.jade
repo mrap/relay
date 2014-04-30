@@ -1,5 +1,8 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  .jumbotron
+    h1 Relay
+    p.feed-status Begin by reacting to a few posts
+
+  div(ng-include src="'partials/posts_browser'")

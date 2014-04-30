@@ -1,7 +1,5 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-require('./lib/global_helpers');
-
 var express      = require('express')
   , path         = require('path')
   , favicon      = require('static-favicon')
@@ -14,8 +12,9 @@ var express      = require('express')
 var app = express();
 app.set('env', process.env.NODE_ENV);
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var routes   = require('./routes/index');
+var partials = require('./routes/partials');
+var posts    = require('./routes/posts');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,7 +29,8 @@ app.use(require('node-compass')({mode: 'expanded'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/partials', partials);
+app.use('/posts', posts);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
@@ -63,6 +63,5 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
 
 module.exports = app;

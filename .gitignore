@@ -29,3 +29,8 @@ bower_components
 
 config/private/
 /local/
+
+/.bower-registry/
+/.bower-cache/
+
+/public/lib/
