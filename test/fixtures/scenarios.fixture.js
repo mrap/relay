@@ -21,11 +21,11 @@ module.exports.UserWithConnectionsAndFeed = function(userAttrs, connectionsCount
           // Other user create a post
           PostFixture.createByUser(null, other, function(err, post){
             if (err) return next(err, null);
-            return createConnectedUser(current-1);
           });
+          createConnectedUser(current-1);
         });
       });
     }
-    return createConnectedUser(connectionsCount);
+    createConnectedUser(connectionsCount);
   });
 };
