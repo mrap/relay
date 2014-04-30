@@ -77,8 +77,8 @@ describe("Post Model", function(){
     });
 
     it("should update post `last relayed by`", function(done){
-      post.getLastRelayer(function(err, res){
-        eqObjectIDs(res, relayer).should.be.true;
+      Post.findById(post._id).populate('_last_relayed_by').exec(function(err, res){
+        eqObjectIDs(res._last_relayed_by, relayer).should.be.true;
         done();
       });
     });
@@ -123,7 +123,7 @@ describe("Post Model", function(){
       });
     });
 
-    describe("option: WITH_LAST_RELAYER", function(){
+    describe("option: WITH_LAST_RELAYED_BY", function(){
       var relayer = null;
       beforeEach(function(done){
         Factory.create('User', function(err, u){
@@ -131,6 +131,7 @@ describe("Post Model", function(){
           user.connectWithUser(10, relayer, function(err, res){
             PostFixture.createByUser(null, user, function(err, p){
               post = p;
+              postIds = [post._id];
               relayer.relayOtherPost(post, done);
             });
           });
@@ -138,10 +139,10 @@ describe("Post Model", function(){
       });
 
       it("should return the last relayer", function(done){
-        Post.findByIds(postIds, {WITH_LAST_RELAYER: true}, function(err, posts){
+        Post.findByIds(postIds, {WITH_LAST_RELAYED_BY: true}, function(err, posts){
           if (err) return done(err);
           var first = posts[0];
-          eqObjectIDs(first.last_relayer, relayer);
+          eqObjectIDs(first._last_relayed_by, relayer);
           done();
         });
       });

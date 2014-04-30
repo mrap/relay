@@ -101,16 +101,19 @@ userSchema.methods.relayOwnPost = function(post, callback){
   });
 };
 
-userSchema.methods.relayOtherPost = function(post, callback){
+userSchema.methods.relayOtherPost = function(post, next){
   var user = this;
   user.getConnections(function(err, connections){
-    if (err) return callback(err, null);
+    if (err) return next(err, null);
 
     // 1. Send post to connections
     FeedManager.sendExistingPostToConnections(user, post, connections, function(err, res){
-      if (err) return callback(err, null);
+      if (err) return next(err, null);
+
+      // 2. Update post's '_last_relayed_by' field
+      // TODO: check and handle case where post is a ObjectID
+      post.update({_last_relayed_by: user}, next);
       EventsMonitor.emit("userRelayedPost", null, user, post);
-      callback(null, res);
     });
   });
 };
