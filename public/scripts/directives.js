@@ -2,13 +2,11 @@
 
 var directives = angular.module('relay.directives', []);
 
-directives.directive('postsBrowser', ['postService', function(postService){
+directives.directive('feed', ['postService', function(postService){
   function link(scope, element, attrs){
-    scope.currentPost = 0;
 
-    // Display the first post when results are received
     scope.$watch('posts', function(){
-      scope.post = scope.posts[scope.currentPost];
+      // Do stuff when 'posts' data is updated
     }, true);
 
     if (attrs.publicFeed) {

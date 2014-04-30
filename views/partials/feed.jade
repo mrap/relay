@@ -1,0 +1,6 @@
+h1 Posts Browser
+
+div(ng-controller="PostsController")
+  div(feed public-feed='popular')
+    div(ng-repeat='post in posts')
+      {{ post._last_relayed_by.username.toUpperCase() }} relayed a post:
