@@ -84,7 +84,7 @@ describe("Post Model", function(){
     });
 
     it("should update post `relay_count`", function(done){
-      Post.findById(post._id).exec(function(err, res){
+      Post.findById(post._id).select('+relay_count').exec(function(err, res){
         expect(res.relay_count).to.eq(1);
         done();
       });

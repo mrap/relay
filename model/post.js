@@ -9,9 +9,9 @@ var mongoose      = require('mongoose')
   , getObjectID   = helpers.getObjectID;
 
 var postSchema = Schema({
-  _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true, select: false },
   _last_relayed_by: { type: Schema.Types.ObjectId, ref: 'User' },
-  relay_count:      { type: Number, default: 0 },
+  relay_count:      { type: Number, default: 0, select: false },
   content:          { type: String }
 });
 
@@ -23,6 +23,7 @@ postSchema.statics.createByUser = function(attrs, user, callback){
   /*** Save Post ***/
   var newPost = new this(attrs);
   newPost._author = user;
+  newPost._last_relayed_by = user;
   newPost.save(function(err){
     if (err) return callback(err, null);
     /*** Add to Author's posts ***/
@@ -38,7 +39,7 @@ postSchema.statics.findByIds = function(ids, options, next){
   var Post = this;
   if (!ids || ids.length === 0) return next(null, []);
   var query = Post.find({'_id': {'$in': ids}});
-  if (options.WITH_AUTHOR) query.populate('_author');
+  if (options.WITH_AUTHOR) query.select('+_author').populate('_author');
   if (options.WITH_LAST_RELAYED_BY) query.populate('_last_relayed_by');
   query.exec(next);
 };

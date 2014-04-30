@@ -89,14 +89,14 @@ userSchema.methods.getDistanceToUser = function(other, callback){
   UserConnectionManager.getDistanceBetweenUsers(this, other, callback);
 };
 
-userSchema.methods.relayOwnPost = function(post, callback){
+userSchema.methods.relayOwnPost = function(post, next){
   var user = this;
   user.getConnections(function(err, connections){
-    if (err) return callback(err, null);
+    if (err) return next(err, null);
     FeedManager.sendNewPostToConnections(user, post, connections, function(err, res){
-      if (err) return callback(err, null);
+      if (err) return next(err, null);
       EventsMonitor.emit("userCreatedPost", null, user, post);
-      callback(null, res);
+      next(null, res);
     });
   });
 };
