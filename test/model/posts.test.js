@@ -107,13 +107,18 @@ describe("Post Model", function(){
     });
 
     describe("option: WITH_AUTHOR", function(){
-      it("should return the full author object too", function(done){
+      beforeEach(function(done){
         Post.findByIds(postIds, {WITH_AUTHOR: true}, function(err, posts){
           if (err) return done(err);
-          var first = posts[0];
-          eqObjectIDs(first._author, user).should.be.true;
+          firstPost = posts[0];
           done();
         });
+      });
+      it("should return the full author object too", function(){
+        eqObjectIDs(firstPost._author, user).should.be.true;
+      });
+      it("should not include author's password field", function(){
+        firstPost._author.should.not.have.ownProperty('password');
       });
     });
 

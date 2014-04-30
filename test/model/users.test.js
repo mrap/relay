@@ -46,6 +46,18 @@ describe("User Model", function(){
       expect(user.password).to.not.eq(originalPassword);
     });
 
+    describe("#findByIdJSON", function(){
+      beforeEach(function(done){
+        User.findByIdJSON(user._id.toString(), function(err, res){
+          result = res;
+          done();
+        });
+      });
+      it("should not have password", function(){
+        result.should.not.have.ownProperty('password');
+      });
+    });
+
     describe("checking for a valid password", function(){
       it("should return true for a valid password", function(done){
         user.isValidPassword(originalPassword, function(err, res){

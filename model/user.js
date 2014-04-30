@@ -116,6 +116,10 @@ userSchema.methods.relayOtherPost = function(post, callback){
 };
 
 /***** Static Model Methods *****/
+userSchema.statics.safeFields = function(){
+  return '-password';
+};
+
 userSchema.statics.connectUsers = function(user1, user2, distance, callback){
   UserConnectionManager.connectUsers(user1, user2, distance, callback);
 };
@@ -135,6 +139,10 @@ userSchema.statics.getConnectedUsers = function(user, callback){
 
 userSchema.statics.feedKeyForID = function(id){
   return key.keyIDAttribute("user", id.toString(), "feed" );
+};
+
+userSchema.statics.findByIdJSON = function(id, next){
+  this.findById(id).select(this.safeFields()).exec(next);
 };
 
 /**

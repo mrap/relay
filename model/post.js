@@ -4,7 +4,9 @@ var mongoose      = require('mongoose')
   , redis_key     = require('./redis_key')
   , User          = mongoose.model('User')
   , EventsMonitor = require('./events_monitor')
-  , client        = require('./redis_client');
+  , client        = require('./redis_client')
+  , helpers       = require('../lib/global_helpers')
+  , getObjectID   = helpers.getObjectID;
 
 var postSchema = Schema({
   _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -30,7 +32,7 @@ postSchema.methods.getLastRelayerID = function(next){
 postSchema.methods.getLastRelayer = function(next){
   this.getLastRelayerID(function(err, id){
     if (err) throw err;
-    User.findById(id, next);
+    User.findById(id).select('-password').exec(next);
   });
 };
 
@@ -54,7 +56,7 @@ postSchema.statics.findByIds = function(ids, options, next){
   var Post = this;
   if (!ids || ids.length === 0) return next(null, []);
   var query = Post.find({'_id': {'$in': ids}});
-  if (options.WITH_AUTHOR) query.populate('_author');
+  if (options.WITH_AUTHOR) query.populate('_author').select(User.safeFields());
   query.exec(function(err, posts){
     if      (err) throw err;
     else if (options.WITH_LAST_RELAYER) Post.updatePostsWithLastRelayers(posts, next);
