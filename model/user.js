@@ -45,6 +45,11 @@ userSchema.post('save', function(user){
   user._needsEncryption = false;
 });
 
+userSchema.pre('init', function(next){
+  this._needsEncryption = false;
+  next();
+});
+
 userSchema.virtual('needsEncryption').set(function(b){
   this._needsEncryption = b;
 });
@@ -169,7 +174,7 @@ userSchema.statics.feedKeyForID = function(id){
  * callback returns (error, post, user)
  */
 userSchema.statics.addPost = function(id, post, callback){
-  this.findById(id).select('+password').exec( function(err, user){
+  this.findById(id).exec( function(err, user){
     if (err) return callback(err, null, null);
     if (user.posts.indexOf(post._id) !== -1) return callback(new Error("User already has post: " + post), null, null);
     user.posts.push(post._id);
