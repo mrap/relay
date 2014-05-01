@@ -1,10 +1,11 @@
 'use script'
 
-var Browser = require('zombie')
-  , browser = new Browser();
+var Browser  = require('zombie');
+Browser.site = "http://localhost:5000/";
 
 describe("User login", function(){
   var password = "my password";
+  browser = new Browser();
 
   beforeEach(function(done){
     Factory.create('User', {password: password}, function(err, u){
@@ -16,8 +17,13 @@ describe("User login", function(){
 
   describe("with valid credentials", function(){
     beforeEach(function(done){
-      browser.visit("/").then(done, function(){
-        done();
+      browser.visit('/login', function(){
+        browser
+          .fill("username", user.username)
+          .fill("password", password)
+          .pressButton("Login", function(err){
+            done();
+          });
       });
     });
 

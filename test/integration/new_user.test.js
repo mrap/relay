@@ -1,7 +1,7 @@
 'use strict'
 
-var Browser = require('zombie')
-  , browser = new Browser();
+var Browser  = require('zombie');
+Browser.site = "http://localhost:5000/";
 
 describe("New User", function(){
   var attrs = { username: "mrap" }
