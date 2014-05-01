@@ -32,6 +32,7 @@
     "static-favicon": "~1.0.0"
   },
   "devDependencies": {
-    "monky": "~0.3.1"
+    "monky": "~0.3.1",
+    "zombie": "~2.0.0-alpha31"
   }
 }
