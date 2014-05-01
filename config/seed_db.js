@@ -1,9 +1,10 @@
 var ScenarioFixture = require('../test/fixtures/scenarios.fixture')
   , mongoose = require('mongoose')
   , client = require('../model/redis_client')
+  , env    = require('../config').env
   , assert = require('assert');
 
-assert(process.env.NODE_ENV === 'development');
+assert(env === 'development');
 
 var seedDB = function(){
 
