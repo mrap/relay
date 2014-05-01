@@ -1,18 +1,18 @@
-var express      = require('express')
+var config       = require('./config')
+  , express      = require('express')
   , path         = require('path')
   , favicon      = require('static-favicon')
   , logger       = require('morgan')
   , cookieParser = require('cookie-parser')
   , bodyParser   = require('body-parser')
-  , db           = require('./model/db');
+  , session      = require('express-session')
+  , flash        = require('connect-flash')
+  , db           = require('./model/db')
+  , passport     = require('./config/passport');
 
 // Configure App
 var app = express();
 app.set('env', process.env.NODE_ENV);
-
-var routes   = require('./routes/index');
-var partials = require('./routes/partials');
-var posts    = require('./routes/posts');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,8 +25,16 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(require('node-compass')({mode: 'expanded'}));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: config.session.secret, cookie: { maxAge: 60000 } }));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.use('/', routes);
+// Configure Routes
+var index   = require('./routes/index');
+var partials = require('./routes/partials');
+var posts    = require('./routes/posts');
+app.use('/', index);
 app.use('/partials', partials);
 app.use('/posts', posts);
 

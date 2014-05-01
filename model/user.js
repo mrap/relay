@@ -107,6 +107,7 @@ userSchema.methods.getConnectionsCount = function(callback){
 };
 
 userSchema.methods.isValidPassword = function(data, callback){
+  if (!this.password) return callback(new Error("isValidPassword requires a user object with .password field"), false);
   matchesHash(data, this.password, callback);
 };
 
