@@ -1,6 +1,6 @@
 var redis  = require('redis')
-  , port   = (process.env.NODE_ENV == 'test') ? 7777 : 6379
-  , client = redis.createClient(port);
+  , config = require('../config')
+  , client = redis.createClient(config.redis.port);
 
 client.on("connect", function(){
   console.log("Redis connected at port %s", client.port);

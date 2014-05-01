@@ -34,3 +34,4 @@ config/private/
 /.bower-cache/
 
 /public/lib/
+/config/secret/

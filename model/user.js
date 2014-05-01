@@ -1,12 +1,14 @@
 var key                   = require('./redis_key')
   , mongoose              = require('mongoose')
+  , attachments           = require('mongoose-attachments-aws2js')
   , Schema                = mongoose.Schema
   , UserConnectionManager = require('./user_connection_manager')
   , UserConnection        = require('./user_connection')
   , ObjectId              = mongoose.Types.ObjectId
   , bcrypt                = require('bcrypt')
   , FeedManager           = require('./feed_manager')
-  , EventsMonitor         = require('./events_monitor');
+  , EventsMonitor         = require('./events_monitor')
+  , config                = require('../config');
 
 /*** Encryption ***/
 var generateHash = function(data, callback){
@@ -52,6 +54,28 @@ userSchema.virtual('needsEncryption').get(function(){
   else {
     this._needsEncryption = true;
     return this._needsEncryption;
+  }
+});
+
+/*** Attachments ***/
+userSchema.plugin(attachments, {
+  directory: 'users',
+  storage: {
+    providerName: 'aws2js',
+    options: {
+      key    : config.s3.key,
+      secret : config.s3.secret,
+      bucket : config.s3.bucket
+    }
+  },
+  properties: {
+    profile_image: {
+      styles: {
+        medium: {
+          resize: '150x150'
+        }
+      }
+    }
   }
 });
 

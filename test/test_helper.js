@@ -1,3 +1,4 @@
+process.env.NODE_ENV  = 'test';
 
 /*** Global Suite Setup and Tear Down ***/
 var mongoose = require('mongoose')
@@ -5,7 +6,6 @@ var mongoose = require('mongoose')
 
 /*** Setup ***/
 before(function(done){
-  process.env.NODE_ENV  = 'test';
   app                   = require('../app');
   chai                  = require('chai');
   should                = chai.should();
