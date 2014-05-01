@@ -1,4 +1,4 @@
-'use script'
+'use strict'
 
 var Browser  = require('zombie');
 Browser.site = "http://localhost:5000/";
