@@ -24,6 +24,7 @@ before(function(done){
     UserFixture           = require('./fixtures/users.fixture');
     ScenarioFixture       = require('./fixtures/scenarios.fixture');
     Factory               = require('./factories');
+    integrationHelpers    = require('./integration/helpers');
     done();
   });
 });
