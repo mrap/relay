@@ -94,6 +94,7 @@ userSchema.methods.keyID = function(attr) {
   else      return key.keyID("user", this._id);
 };
 
+var INITIAL_CONNECTION_DISTANCE = 10;
 userSchema.methods.connectWithUser = function(distance, other, callback){
   UserConnectionManager.connectUsers(this, other, distance, callback);
 };
@@ -117,6 +118,10 @@ userSchema.methods.getConnections = function(callback){
 
 userSchema.methods.getDistanceToUser = function(other, callback){
   UserConnectionManager.getDistanceBetweenUsers(this, other, callback);
+};
+
+userSchema.methods.isConnectedToUser = function(other, callback){
+  UserConnectionManager.areUsersConnected(this, other, callback);
 };
 
 userSchema.methods.relayOwnPost = function(post, next){
@@ -149,6 +154,46 @@ userSchema.methods.relayOtherPost = function(post, next){
 };
 
 /***** Static Model Methods *****/
+
+userSchema.statics.createAndRelayPosts = function(attrs, posts, done){
+  var User = this;
+  // Create user
+  var user = new User(attrs);
+  user.save(function(err){
+    if (err) return done(err, null);
+
+    var Post = mongoose.model('Post'); // require Post here to avoid circular dependency
+    Post.findByIds(posts, {WITH_LAST_RELAYED_BY: true}, function(err, dbPosts){
+      if (err) return done(err, user);
+
+      // Connect with each last relayer and relay the post
+      function connectWithAnother(itr){
+        if (itr === dbPosts.length) return done(null, user);
+
+        // 1. Connect last relayer with user
+        // Last relayer must be the origin of the connection
+        var currentPost = dbPosts[itr];
+        var lastRelayer = currentPost._last_relayed_by;
+        lastRelayer.connectWithUser(INITIAL_CONNECTION_DISTANCE, user, function(err, connection){
+          if (err) return done(err, user);
+
+          // 2. Insert post into user's feed
+          FeedManager.sendExistingPostToConnections(lastRelayer, currentPost, [connection], function(err, res){
+            if (err) return done(err, user);
+            // 3. User relay post
+            user.relayOtherPost(posts[itr], function(err, res){
+              if (err) return done(err, user);
+              // 4. Do the next post
+              connectWithAnother(itr+1);
+            });
+          });
+        });
+      }
+      connectWithAnother(0);
+    });
+  });
+};
+
 userSchema.statics.connectUsers = function(user1, user2, distance, callback){
   UserConnectionManager.connectUsers(user1, user2, distance, callback);
 };

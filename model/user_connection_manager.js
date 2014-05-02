@@ -4,8 +4,9 @@ var UserConnection = require('./user_connection')
   , getObjectID    = helpers.getObjectID
   , eqObjectIDs    = helpers.eqObjectIDs;
 
-var USERS_NOT_CONNECTED = -1;
-var MIN_DISTANCE        = 1;
+var USERS_NOT_CONNECTED = -1
+  , MIN_DISTANCE        = 1
+  , DEFAULT_DISTANCE    = 10;
 
 var UserConnectionManager = {
 
@@ -24,6 +25,7 @@ var UserConnectionManager = {
    */
   connectUsers: function(user1, user2, distance, callback){
     var self = this;
+    distance = distance || DEFAULT_DISTANCE;
     self.getDistanceBetweenUsers(user1, user2, function(err, prevDist){
       if (err) return callback(err, null);
       if (prevDist !== USERS_NOT_CONNECTED) return callback(null, new UserConnection(user1, user2, prevDist));

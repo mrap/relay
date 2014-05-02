@@ -149,24 +149,26 @@ var FeedManager = {
     this.sendItemToConnections(feedItem, connections, callback);
   },
 
-  sendExistingPostToConnections: function(user, post, connections, callback){
+  sendExistingPostToConnections: function(user, post, connections, callback, isStrict){
     var self = this;
     // Get post's feedItem from user's feed
     // Configure a new feedItem to send to connections
     self.getUserFeedItem(user, post, function(err, prevItem){
       if (err) return callback(err, null);
       // If no item exists, user doesn't have the post in their feed, short circuit
-      if (!prevItem) return callback(new Error("User does not have post in their feed!"), null);
+      if (isStrict && !prevItem) return callback(new Error("User does not have post in their feed!"), null);
       var feedItem = new FeedItem({
         postID         : getObjectID(post),
         senderID       : getObjectID(user),
-        prevSenderID   : prevItem.senderID,
-        originDistance : prevItem.originDistance+1
+        prevSenderID   : (prevItem) ? prevItem.senderID : getObjectID(user),
+        originDistance : (prevItem) ? prevItem.originDistance+1 : 1
       });
 
       // 1. Send item to connections
       self.sendItemToConnections(feedItem, connections, function(err, res){
         if (err) return callback(err, null);
+        // If no prevItem, we can stop here.
+        if (!prevItem) return callback(null, res);
 
         // 2. Connect user to prevSender of prevItem
         // Dist = distTo sender + dist between sender and prevSender

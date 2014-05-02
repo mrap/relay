@@ -63,6 +63,39 @@ describe("User Model", function(){
     });
   })
 
+  describe("#createAndRelayPosts", function(){;
+    var posts = [];
+    var author1 = null;
+    var author2 = null;
+    beforeEach(function(done){
+      PostFixture.createByUserWithType(null, null, null, function(err, post){
+        author1 = post._author;
+        posts.push(post);
+        PostFixture.createByUserWithType(null, null, null, function(err, post){
+          author2 = post._author;
+          posts.push(post);
+          Factory.build('User', function(err, attrs){
+            User.createAndRelayPosts(attrs, posts, function(err, u){
+              if (err) return done(err);
+              user = u
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    it("should connect user with posts' relayers", function(done){
+      user.isConnectedToUser(author1, function(err, res){
+        expect(res).to.be.true;
+        user.isConnectedToUser(author2, function(err, res){
+          expect(res).to.be.true;
+          done()
+        });
+      });
+    });
+  });
+
   describe("connecting users", function(){
     // user is connected to connUser
     // user is not connected to notConnUser
