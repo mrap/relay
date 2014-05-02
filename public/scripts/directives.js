@@ -2,7 +2,7 @@
 
 var directives = angular.module('relay.directives', []);
 
-directives.directive('feed', ['postService', function(postService){
+directives.directive('feed', ['postManager', function(postManager){
   function link(scope, element, attrs){
 
     scope.$watch('posts', function(){
@@ -11,7 +11,7 @@ directives.directive('feed', ['postService', function(postService){
 
     if (attrs.publicFeed) {
       if(attrs.publicFeed === 'popular'){
-        scope.posts = postService.getPopularPosts();
+        scope.posts = postManager.getPopularPosts();
       }
     }
   }

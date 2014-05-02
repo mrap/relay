@@ -1,8 +1,11 @@
-var factories = angular.module('relay.factories', []);
+var factories = angular.module('relay.factories', [
+  'restangular'
+]);
 
-factories.factory('PostFactory', function(){
-  var Post = function(data){
-    angular.extend(this, data);
+factories.factory('postManager', ['Restangular', function(Restangular){
+  return {
+    getPopularPosts: function(){
+      return Restangular.one('posts').customGETLIST('popular').$object;
+    }
   };
-  return Post;
-});
+}]);
