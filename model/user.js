@@ -99,7 +99,7 @@ userSchema.methods.connectWithUser = function(distance, other, callback){
 };
 
 userSchema.methods.getFeedPostIds = function(callback){
-  FeedManager.getUserFeedPosts(this, false, callback);
+  FeedManager.getUserFeedPosts(this, {IDS_ONLY: true}, callback);
 };
 
 userSchema.methods.getConnectionsCount = function(callback){

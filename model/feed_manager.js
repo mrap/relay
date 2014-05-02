@@ -68,18 +68,36 @@ var FeedManager = {
     client.exists(this.userFeedItemKey(userID, itemID), callback);
   },
 
-  getUserFeedPosts: function(user, withScores, callback){
+  getUserFeedPosts: function(user, options, callback){
+    var self = this;
     var key = this.userFeedKey(user);
-    this.getFeedPostsForKey(key, withScores, callback);
+    options = options || {};
+    this.getFeedPostIDsForKey(key, function(err, postIDs){
+      if (err) return callback(err, null);
+      if (options.IDS_ONLY) return callback(null, postIDs);
+
+      // Get posts from MongoDB
+      Post.findByIds(postIDs, null, function(err, dbPosts){
+        if (err) return callback(err, null);
+
+        // Assign each post.feedItem
+        function assignFeedItem(itr){
+          if (itr === dbPosts.length) return callback(null, dbPosts);
+          self.getUserFeedItem(user, dbPosts[itr], function(err, feedItem){
+            if (err) return callback(err, null);
+            dbPosts[itr].feedItem = feedItem;
+            assignFeedItem(itr+1);
+          });
+        }
+        assignFeedItem(0);
+      });
+    });
   },
 
-  getFeedPostsForKey: function(key, withScores, callback){
+  getFeedPostIDsForKey: function(key, callback){
+    var self = this;
     var args = [key, 0, -1];
-    if (withScores) args.push('WITHSCORES');
-    client.zrange(args, function(err, res){
-      if (err) throw err;
-      callback(null, res);
-    });
+    client.zrange(args, callback);
   },
 
   getUserFeedItem: function(userID, postID, callback){

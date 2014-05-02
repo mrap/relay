@@ -48,6 +48,17 @@ describe("Feed Manager", function(){
       checkAnother(0);
     });
 
+    describe("#getUserFeedPosts", function(){
+      it("should return the post from db with feedItem assigned", function(done){
+        FeedManager.getUserFeedPosts(connectedUserID, null, function(err, posts){
+          if (err) return done(err);
+          var first = posts[0];
+          eqObjectIDs(first.feedItem.postID, post.id);
+          done();
+        });
+      });
+    });
+
     describe("#getUserFeedItem", function(){
       it("should return the correct Feed Item", function(done){
         FeedManager.getUserFeedItem(connectedUserID, post, function(err, item){

@@ -37,6 +37,12 @@ postSchema.virtual('relay_count').get(function(){
   this.__temp_relay_count = v;
 });
 
+postSchema.virtual('feedItem').get(function(){
+  return this.__tempFeedItem || null;
+}).set(function(v){
+  this.__tempFeedItem = v;
+});
+
 /***** Static Model Methods *****/
 postSchema.statics.createByUser = function(attrs, user, callback){
   /*** Save Post ***/
@@ -56,6 +62,7 @@ postSchema.statics.createByUser = function(attrs, user, callback){
 
 postSchema.statics.findByIds = function(ids, options, next){
   var Post = this;
+  options = options || {};
   if (!ids || ids.length === 0) return next(null, []);
   var query = Post.find({'_id': {'$in': ids}});
   if (options.WITH_AUTHOR) query.select('+_author').populate('_author');
