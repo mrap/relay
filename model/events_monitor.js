@@ -9,27 +9,27 @@ var BASE_SCORE = 1
   , POST_RELAYED_SCORE = BASE_SCORE*5;
 
 var EventsMonitor = function(){
+  EventEmitter.call(this);
+
   this.keys = {
-    popularPosts: "manager:popularPosts",
+    popularPosts: "manager:popular_posts",
     post: function(post){
       return "manager:" + getObjectID(post);
     }
   };
 
-  EventEmitter.call(this);
+  /* Events on userRelayedPost */
   this.on("userRelayedPost", function(err, user, post){
+    // Update `popular_posts`
     client.zincrby(this.keys.popularPosts, POST_RELAYED_SCORE, getObjectID(post), function(err, reply){
       if (err) throw err;
     });
-    client.hset(this.keys.post(post), 'last_relayed_by', getObjectID(user), function(err, reply){
-      if (err) throw err;
-    });
   });
+
+  /* Events on userCreatedPost */
   this.on("userCreatedPost", function(err, user, post){
+    // Update `popular_posts`
     client.zincrby(this.keys.popularPosts, POST_CREATED_SCORE, getObjectID(post), function(err, reply){
-      if (err) throw err;
-    });
-    client.hset(this.keys.post(post), 'last_relayed_by', getObjectID(user), function(err, reply){
       if (err) throw err;
     });
   });
