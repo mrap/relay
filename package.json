@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "monky": "~0.3.1",
+    "supertest": "^0.12.0",
     "zombie": "~2.0.0-alpha31"
   }
 }

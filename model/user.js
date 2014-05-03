@@ -138,6 +138,13 @@ userSchema.methods.relayOwnPost = function(post, next){
 
 userSchema.methods.relayOtherPost = function(post, next){
   var user = this;
+  if (post.constructor.name !== 'model') {
+    var Post = mongoose.model('Post');
+    return Post.findById(post, function(err, p){
+      if (err) return next(err, null);
+      user.relayOtherPost(p, next);
+    });
+  };
   user.getConnections(function(err, connections){
     if (err) return next(err, null);
 
@@ -147,7 +154,10 @@ userSchema.methods.relayOtherPost = function(post, next){
 
       // 2. Update post's '_last_relayed_by' field
       // TODO: check and handle case where post is a ObjectID
-      post.update({_last_relayed_by: user, $inc: {__relay_count: 1} }, next);
+      post.update({_last_relayed_by: user, $inc: {__relay_count: 1} }, function(err, res){
+        if (err) return next(err, null);
+        next(null, post);
+      });
       EventsMonitor.emit("userRelayedPost", null, user, post);
     });
   });
