@@ -35,3 +35,4 @@ config/private/
 
 /public/lib/
 /config/secret/
+*.css
