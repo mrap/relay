@@ -1,0 +1,5 @@
+div(ng-switch="isUserLoggedIn")
+  div(ng-switch-when="true")
+    h3#username {{ currentUser.username }}
+  div(ng-switch-default)
+    h3 Begin by reacting to a few posts

@@ -3,7 +3,7 @@ html(ng-app="relay")
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body
+  body(ng-controller="AppController")
     .container
       include includes/flash_messages
       block content

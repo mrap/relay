@@ -1,3 +1,4 @@
 div(ng-controller="PostsController")
+  div(ng-include=" 'partials/feed_header' ")
   div(feed public-feed='popular')
-    .post(ng-repeat='post in posts' ng-include="'partials/post'")
+    .post(ng-repeat='post in posts' ng-include=" 'partials/post' ")

@@ -1,10 +1,15 @@
 var express = require('express');
 var router = express.Router();
-var passport = require('passport');
+var passport = require('../config/passport');
+var User = require('mongoose').model('User');
 
 /* GET home page. */
 router.get('/', function(req, res) {
   res.render('index', {});
+});
+
+router.get('/loggedIn', function(req, res){
+  res.send(req.isAuthenticated() ? req.user : 0);
 });
 
 /* User login */
@@ -20,5 +25,8 @@ router.post('/login',
                                     failureFlash    : true
                                   })
 );
+
+router.post('/signup', function(req, res){
+});
 
 module.exports = router;
