@@ -2,7 +2,7 @@
 
 var request = require('supertest');
 
-describe("Routes: Posts", function(){
+describe("Post Requests", function(){
   var agent  = null
     , cookie = null
     , body   = null;
