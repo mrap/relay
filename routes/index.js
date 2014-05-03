@@ -1,32 +1,25 @@
-var express = require('express');
-var router = express.Router();
-var passport = require('../config/passport');
-var User = require('mongoose').model('User');
+'use strict'
 
-/* GET home page. */
-router.get('/', function(req, res) {
-  res.render('index', {});
-});
+module.exports = function(app) {
 
-router.get('/loggedIn', function(req, res){
-  res.send(req.isAuthenticated() ? req.user : 0);
-});
+  /* View Helpers */
+  app.use(function (req, res, next) {
+    res.locals.userLoggedIn = req.isAuthenticated();
+    next();
+  });
+  app.use(function (req, res, next) {
+    res.locals.user = req.user || null;
+    next();
+  });
 
-/* User login */
-// TODO: Move into own "auth" routes module
-router.get('/login', function(req, res){
-  res.render('users/login', { flash: req.flash() });
-});
+  /* GET home page. */
+  app.get('/', function(req, res) {
+    res.render('index', {});
+  });
 
-router.post('/login',
-            passport.authenticate('local-signup',
-                                  { successRedirect : '/',
-                                    failureRedirect : '/login',
-                                    failureFlash    : true
-                                  })
-);
+  app.use('/'         , require('./auth'));
+  app.use('/partials' , require('./partials') )
+  app.use('/posts'    , require('./posts') );
+  app.use('/users'    , require('./users') );
 
-router.post('/signup', function(req, res){
-});
-
-module.exports = router;
+};

@@ -31,23 +31,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Configure Routes
-var index    = require('./routes/index')
-  , partials = require('./routes/partials')
-  , posts    = require('./routes/posts')
-  , users    = require('./routes/users');
-
-app.use(function (req, res, next) {
-  res.locals.userLoggedIn = req.isAuthenticated();
-  next();
-});
-app.use(function (req, res, next) {
-  res.locals.user = req.user || null;
-  next();
-});
-app.use('/', index);
-app.use('/partials', partials);
-app.use('/posts', posts);
-app.use('/users', users);
+var routes = require('./routes')(app);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {

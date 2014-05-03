@@ -1,4 +1,6 @@
-var express = require('express');
-var router = express.Router();
+'use strict'
+
+var express  = require('express')
+  , router   = express.Router();
 
 module.exports = router;
