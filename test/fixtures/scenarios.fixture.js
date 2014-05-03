@@ -7,20 +7,28 @@ var mongoose    = require('mongoose')
 module.exports.UserWithConnectionsAndFeed = function(userAttrs, connectionsCount, next){
   /*** Setup ***/
   Factory.create('User', userAttrs, function(err, user){
-    if (err) return next(err, null);
+    if (err) return next(err, null, null);
+
+    // Collect otherUsers and posts as they're created
+    var extra = {
+      otherUsers: [],
+      posts: []
+    };
 
     function createConnectedUser(current){
-      if (current === 0) return next(null, user);
+      if (current === 0) return next(null, user, extra);
 
       // Create the other user
       Factory.create('User', function(err, other){
-        if (err) return next(err, null);
+        if (err) return next(err, null, null);
         // Connect with base user
         user.connectWithUser(current, other, function(err, connection){
-          if (err) return next(err, null);
+          if (err) return next(err, null, null);
           // Other user create a post
           PostFixture.createByUserWithType(null, other, 'link_post', function(err, post){
-            if (err) return next(err, null);
+            if (err) return next(err, null, null);
+            extra.otherUsers.push(other);
+            extra.posts.push(post);
           });
           createConnectedUser(current-1);
         });
