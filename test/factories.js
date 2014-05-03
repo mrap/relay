@@ -7,7 +7,7 @@ var UserSchema     = require('../model/user')
 
 monky.factory('User', {
   email:    'user#n@email.com',
-  password: "very secure password",
+  password: "pass",
   username: "username#n"
 });
 
