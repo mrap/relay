@@ -84,6 +84,8 @@ factories.factory('GuestUser', ['User', function(User){
 
     // Inherit from User
     angular.extend(this, User);
+    // Override User relayPost function
+    this.relayPost = this.deferRelay;
   }
 
   return GuestUser;
