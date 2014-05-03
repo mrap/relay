@@ -20,23 +20,34 @@ app.set('view engine', 'jade');
 
 app.use(favicon());
 app.use(logger('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
 app.use(require('node-compass')({mode: 'expanded'}));
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: config.session.secret, cookie: { maxAge: 60000 } }));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Configure Routes
-var index   = require('./routes/index');
-var partials = require('./routes/partials');
-var posts    = require('./routes/posts');
+var index    = require('./routes/index')
+  , partials = require('./routes/partials')
+  , posts    = require('./routes/posts')
+  , users    = require('./routes/users');
+
+app.use(function (req, res, next) {
+  res.locals.userLoggedIn = req.isAuthenticated();
+  next();
+});
+app.use(function (req, res, next) {
+  res.locals.user = req.user || null;
+  next();
+});
 app.use('/', index);
 app.use('/partials', partials);
 app.use('/posts', posts);
+app.use('/users', users);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {

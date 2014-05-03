@@ -2,13 +2,18 @@ extends ../layout
 
 block content
   h1 User Login
-  form(role="form" action="/login" method="post")
-    .form-group
 
-      label.sr-only(for="username") Username
-      input.form-control(type="text" name="username" placeholder="Username")
+  if (!userLoggedIn)
+    form(role="form" action="/login" method="post")
+      .form-group
 
-      label.sr-only(for="password") Password
-      input.form-control(type="password" name="password" placeholder="Password")
+        label.sr-only(for="username") Username
+        input.form-control(type="text" name="username" placeholder="Username")
 
-    button.btn.btn-primary(type="submit") Login
+        label.sr-only(for="password") Password
+        input.form-control(type="password" name="password" placeholder="Password")
+
+      button.btn.btn-primary(type="submit") Login
+
+  else
+    p You are logged in as #{ user.username }
