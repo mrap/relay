@@ -9,5 +9,8 @@ var app = angular.module('relay', [
 
 app.config(['RestangularProvider', function(RestangularProvider){
   RestangularProvider.setBaseUrl('http://localhost:3000');
+  RestangularProvider.setRestangularFields({
+    id: "_id"
+  });
 }]);
 

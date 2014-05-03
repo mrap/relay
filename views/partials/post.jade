@@ -6,3 +6,7 @@
     | Created {{ post.relay_count }} users away
 
 .post-body(ng-include="'partials/'+ post._type")
+
+.post-controls
+  button(ng-click="currentUser.relayPost(post)")
+    | Relay
