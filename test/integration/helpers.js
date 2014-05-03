@@ -1,12 +1,15 @@
 'use strict'
 
-var LOGIN_URL = '/login';
-var DEFAULT_PASSWORD = 'my password';
+var LOGIN_URL = '/login'
+  , DEFAULT_PASSWORD = 'my password'
+  , Browser  = require('zombie');
 
-function userLoginBrowser(user, password, browser, done){
+Browser.site = "http://localhost:5000/";
+
+function userLoginBrowser(username, password, browser, done){
   if (!browser) return done(new Error("userLoginBrowser needs a browser!"), null);
 
-  if (!user){
+  if (!username || !password){
     Factory.create('User', {password: DEFAULT_PASSWORD}, function(err, newUser){
       if (err) return done(err);
       return userLoginBrowser(newUser, DEFAULT_PASSWORD, browser, done);
@@ -17,7 +20,7 @@ function userLoginBrowser(user, password, browser, done){
     // Login user in the browser
     browser.visit(LOGIN_URL, function(){
       browser
-      .fill("username", user.username)
+      .fill("username", username)
       .fill("password", password)
       .pressButton("Login", function(){
         return done(null, browser);
@@ -27,11 +30,22 @@ function userLoginBrowser(user, password, browser, done){
 };
 
 // Handles with or without user
-module.exports.userLoginBrowser = function(user, password, browser, done){
-  if (typeof done === 'undefined') {
-    done = password; browser = user;
+module.exports.userLoginBrowser = function(username, password, browser, done){
+
+  // One arg, callback only
+  if (typeof password === 'undefined') {
+    done = username;
+    browser = new Browser();
     return userLoginBrowser(null, null, browser, done);
   }
- userLoginBrowser(user, password, browser, done);
+
+  // Two args, browser and callback
+  else if (typeof done === 'undefined') {
+    done = password; browser = username;
+    return userLoginBrowser(null, null, browser, done);
+  }
+
+  // All args
+ userLoginBrowser(username, password, browser, done);
 };
 

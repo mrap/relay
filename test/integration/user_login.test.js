@@ -3,7 +3,7 @@
 var Browser  = require('zombie');
 Browser.site = "http://localhost:5000/";
 
-describe("User login", function(){
+describe.skip("User login", function(){
   var user = null
     , password = "my password"
 
@@ -19,7 +19,7 @@ describe("User login", function(){
     var browser = null;
     beforeEach(function(done){
       browser = new Browser();
-      integrationHelpers.userLoginBrowser(user, password, browser, function(err, b){
+      integrationHelpers.userLoginBrowser(user.username, password, browser, function(err, b){
         if (err) return done(err);
         browser = b;
         done();
