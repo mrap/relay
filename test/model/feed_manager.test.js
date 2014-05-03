@@ -9,7 +9,7 @@ describe("Feed Manager", function(){
   var result           = null;
 
   beforeEach(function(done){
-    UserFixture.createUserWithConnections(connectionsCount, connectionsDist, null, function(err, u){
+    UserFixture.createUserWithConnections({}, connectionsCount, connectionsDist, function(err, u){
       if (err) done(err);
       user = u;
       Factory.create('Post', function(err, p){

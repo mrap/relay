@@ -8,7 +8,7 @@ describe("UserFixture", function(){
     var connectionsCount = 10;
     beforeEach(function(done){
       // params (connections count, distance, user attributes, callback (returns user)
-      UserFixture.createUserWithConnections(connectionsCount, distance, null, function(err, res){
+      UserFixture.createUserWithConnections({}, connectionsCount, distance, function(err, res){
         user = res;
         done();
       });

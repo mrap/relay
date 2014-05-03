@@ -11,7 +11,7 @@ describe("Relay Logic", function(){
   beforeEach(function(done){
     // Create User with connections
     // Author is only connected to user, but not it's other connections
-    UserFixture.createUserWithConnections(connectionsCount, initConnDist, null, function(err, u){
+    UserFixture.createUserWithConnections({}, connectionsCount, initConnDist, function(err, u){
       if (err) done(err);
       user = u;
       Factory.create('User', function(err, a){

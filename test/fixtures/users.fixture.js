@@ -1,7 +1,7 @@
 var Factory = require('../factories');
 
 var Fixture = {
-  createUserWithConnections: function(connectionsCount, connectionDist, userAttrs, callback){
+  createUserWithConnections: function(userAttrs, connectionsCount, connectionDist, callback){
     /** Create user **/
     Factory.create('User', userAttrs, function(err, user){
       if (err) return callback(err, null);

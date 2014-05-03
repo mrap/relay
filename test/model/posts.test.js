@@ -4,7 +4,7 @@ describe("Post Model", function(){
 
   // Create the user
   beforeEach(function(done){
-    UserFixture.createUserWithConnections(3, 10, null, function(err, res){
+    UserFixture.createUserWithConnections({}, 3, 10, function(err, res){
       if (err) return done(err);
       user = res;
       PostFixture.createByUserWithType(null, user, null, function(err, p){
