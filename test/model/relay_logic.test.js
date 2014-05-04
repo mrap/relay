@@ -63,5 +63,13 @@ describe("Relay Logic", function(){
       }
       checkAnother(0);
     });
+
+    it("should mark the feedItem as relayed", function(done){
+      FeedManager.getUserFeedItem(user, post, function(err, feedItem){
+        if (err) return done(err);
+        expect(feedItem.relayed).to.be.true;
+        done();
+      });
+    });
   });
 });

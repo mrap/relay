@@ -6,9 +6,10 @@ var client                = require('./redis_client')
 
 // Redis fields
 var FIELD = {
-  SENDER : "sender",
+  SENDER      : "sender",
   PREV_SENDER : "prev_sender",
-  ORIGIN_DIST : "origin_dist"
+  ORIGIN_DIST : "origin_dist",
+  RELAYED     : "relayed"
 };
 
 var FeedManager = {
@@ -20,6 +21,7 @@ var FeedManager = {
 
   __addFeedItem: function(userID, feedItem){
     var hash = {};
+    hash[FIELD.RELAYED] = feedItem.relayed;
     // Check to avoid storing null values (wastes space)
     if (feedItem.senderID)      hash[FIELD.SENDER]      = feedItem.senderID;
     if (feedItem.prevSenderID)  hash[FIELD.PREV_SENDER] = feedItem.prevSenderID;
@@ -108,9 +110,11 @@ var FeedManager = {
       if (!res) return callback(null, null);
       var feedItem = new FeedItem({
           postID         : postID,
+          relayed        : res.relayed,
           senderID       : res.sender,
           prevSenderID   : res.prevSender,
           originDistance : res.origin_dist });
+
       callback(null, feedItem);
     });
   },
@@ -143,6 +147,7 @@ var FeedManager = {
 
   sendNewPostToConnections: function(sender, post, connections, callback){
     var feedItem = new FeedItem({
+      relayed        : true,
       postID         : getObjectID(post),
       senderID       : getObjectID(sender)
     });
@@ -158,6 +163,7 @@ var FeedManager = {
       // If no item exists, user doesn't have the post in their feed, short circuit
       if (isStrict && !prevItem) return callback(new Error("User does not have post in their feed!"), null);
       var feedItem = new FeedItem({
+        relayed        : true,
         postID         : getObjectID(post),
         senderID       : getObjectID(user),
         prevSenderID   : (prevItem) ? prevItem.senderID : getObjectID(user),
