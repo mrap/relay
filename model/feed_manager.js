@@ -15,8 +15,9 @@ var FIELD = {
 var FeedManager = {
   // Chainable Redis commands
   // Prefixed with `__`
-  __addFeedItemScore: function(userID, feedItem){
-    return ["zadd", this.userFeedKey(userID), feedItem.score, feedItem.postID];
+  __addFeedItemScore: function(userID, feedItem, score){
+    score = score || feedItem.score;
+    return ["zadd", this.userFeedKey(userID), score, feedItem.postID];
   },
 
   __addFeedItem: function(userID, feedItem){
@@ -57,13 +58,66 @@ var FeedManager = {
     });
   },
 
+  isAttributeUpdatable: function(attribute) {
+    if (typeof attribute !== 'string') throw new Error("Attribute must be a string");
+    var upperCased = attribute.toUpperCase();
+    return upperCased === 'SCORE' || FIELD.hasOwnProperty(upperCased);
+  },
+
+  updateUserPostFeedItemAttributeValue: function(user, post, attribute, value, done){
+    var self = this
+      , userID = getObjectID(user)
+      , postID = getObjectID(post);
+    if (!userID)                               return done(new Error("Requires user"), null);
+    if (!postID)                               return done(new Error("Requires post"), null);
+    if (!self.isAttributeUpdatable(attribute)) return done(new Error("%s is not an updatable attribute"), null);
+
+    // Uppercase attribute to make it easier to work with FIELD
+    attribute = attribute.toUpperCase();
+
+    self.getUserFeedItem(user, post, function(err, feedItem){
+      if (err)       return done(err, null);
+      if (!feedItem) return done(new Error("Cannot update feedItem: user's feed doesn't contain item for post: %s", post), null);
+
+      // Update feedItem
+      // Uses Redis multi commands for convenience only.
+      // We already have prewritten transactions, might as well use them.
+      //
+      // If 'score', update item's score in feed's sorted set
+      if (attribute === 'SCORE') {
+        var newScore = Number(value)
+        if (!newScore) return done(new Error("Cannot update feedItem's score with value: %s", value), null);
+        client.multi([self.__addFeedItemScore(user, feedItem, newScore)]).exec( function(err, replies){
+          if (err) return done(err, null);
+          feedItem.score = newScore;
+          // Return updated feedItem
+          done(null, feedItem);
+        });
+      }
+
+      // Else, update item's hash field
+      else {
+        var prop = FIELD[attribute];
+        feedItem[prop] = value;
+        client.multi([self.__addFeedItem(user, feedItem)]).exec( function(err, replies){
+          if (err) return done(err, null);
+          // Return updated feedItem
+          done(null, feedItem);
+        });
+      }
+    });
+  },
+
   userFeedKey: function(userID){
     userID = getObjectID(userID);
     return key.keyIDAttribute("user", userID.toString(), "feeditems" );
   },
 
-  userFeedItemKey: function(userID, itemID){
-    return "user"+":"+userID.toString()+":"+"feeditem"+":"+itemID.toString();
+  userFeedItemKey: function(user, item){
+    var userID = getObjectID(user)
+      , itemID = getObjectID(item);
+
+    return "user"+":"+userID+":"+"feeditem"+":"+itemID;
   },
 
   userFeedHasItem: function(userID, itemID, callback){

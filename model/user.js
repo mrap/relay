@@ -163,6 +163,29 @@ userSchema.methods.relayOtherPost = function(post, next){
   });
 };
 
+/**
+ * Marks feedItem.relayed as false
+ *
+ * TODO: Completely reverse all changes as they were before relay.
+ * This might require a transaction stack of some sort.
+ */
+userSchema.methods.unrelayPost = function(post, done){
+  var user = this;
+
+  if (post.constructor.name !== 'model') {
+    var Post = mongoose.model('Post');
+    return Post.findById(post, function(err, p){
+      if (err) return next(err, null);
+      user.unrelayPost(p, done);
+    });
+  };
+
+  FeedManager.updateUserPostFeedItemAttributeValue(user, post, 'relayed', false, function(err, res){
+    if (err) return done(err, null);
+    done(null, res);
+  });
+};
+
 /***** Static Model Methods *****/
 
 userSchema.statics.createAndRelayPosts = function(attrs, posts, done){

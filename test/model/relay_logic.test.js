@@ -39,7 +39,7 @@ describe("Relay Logic", function(){
   describe("user relays a connected user's post", function(){
     beforeEach(function(done){
       user.relayOtherPost(post, function(err, res){
-        if (err) done(err);
+        if (err) return done(err);
         done()
       });
     });
@@ -78,15 +78,15 @@ describe("Relay Logic", function(){
     // TODO: Reverse a relay.
     // Reverse all changes as they were before relay.
     // This might require a transaction stack of some sort.
-    describe.skip("user unrelays a post", function(){
+    describe("user unrelays a post", function(){
       beforeEach(function(done){
         user.unrelayPost(post, function(err, res){
-          if (err) done(err);
+          if (err) return done(err);
           done()
         });
       });
 
-      it("should reset distance to author", function(done){
+      it.skip("should reset distance to author", function(done){
         user.getDistanceToUser(author, function(err, dist){
           dist.should.not.eq(-1);
           dist.should.be.eq(initConnDist);
@@ -94,7 +94,7 @@ describe("Relay Logic", function(){
         });
       });
 
-      it("should make all other connections closer to user (back to original distance)", function(done){
+      it.skip("should make all other connections closer to user (back to original distance)", function(done){
         function checkAnother(current){
           if (current >= connectionsCount) return done();
           var cUser = connUsers[current];

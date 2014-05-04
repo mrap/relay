@@ -8,6 +8,8 @@ var FIELD = {
   RELAYED     : "relayed"
 };
 
+
+// Prioritizes FIELD properties as attribute values
 var FeedItem = function FeedItem(attrs){
 
   this.postID =
@@ -15,21 +17,24 @@ var FeedItem = function FeedItem(attrs){
     null;
 
   this.senderID =
-    getObjectID(attrs.senderID)      ||
     getObjectID(attrs[FIELD.SENDER]) ||
+    getObjectID(attrs.senderID)      ||
     null;
 
-  // If none, defaults to senderID or null.
   this.prevSenderID =
-    getObjectID(attrs.prevSenderID)       ||
     getObjectID(attrs[FIELD.PREV_SENDER]) ||
+    getObjectID(attrs.prevSenderID)       ||
     this.senderID;
 
   this.relayed =
     (!attrs.relayed || attrs.relayed === 'false') ? false : true;
 
-  this.score          = attrs.score || 0;
-  this.originDistance = attrs.originDistance || attrs[FIELD.ORIGIN_DIST]              || 1;
+  this.score = attrs.score || 0;
+
+  this.originDistance =
+    attrs[FIELD.ORIGIN_DIST] ||
+    attrs.originDistance     ||
+    1;
 
   // Convert strings to numbers and bools
   this.score          = Number(this.score);
