@@ -50,7 +50,7 @@ describe("Feed Manager", function(){
 
     describe("#getUserFeedPosts", function(){
       it("should return the post from db with feedItem assigned", function(done){
-        FeedManager.getUserFeedPosts(connectedUserID, null, function(err, posts){
+        FeedManager.getUserFeedPosts(connectedUserID, function(err, posts){
           if (err) return done(err);
           var first = posts[0];
           eqObjectIDs(first.feedItem.postID, post.id);

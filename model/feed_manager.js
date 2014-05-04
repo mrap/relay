@@ -68,7 +68,7 @@ var FeedManager = {
     client.exists(this.userFeedItemKey(userID, itemID), callback);
   },
 
-  getUserFeedPosts: function(user, options, callback){
+  getUserFeedPosts: function(user, callback, options){
     var self = this;
     var key = this.userFeedKey(user);
     options = options || {};
