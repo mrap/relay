@@ -9,18 +9,21 @@ var app = angular.module('relay', [
 ]);
 
 app.config(['RestangularProvider', function(RestangularProvider){
-
   RestangularProvider.setBaseUrl('http://localhost:3000');
-
   RestangularProvider.setRestangularFields({
     id: "_id"
   });
+}]);
 
-  RestangularProvider.addElementTransformer('posts', function(post){
-    post.feedItem = post.feedItem || {};
-    post.relayed  = post.feedItem.relayed || false;
-    return post;
+app.run(['Restangular', 'Post', 'User', function(Restangular, Post, User){
+  Restangular.extendModel('posts', function(model){
+    angular.extend(model, Post);
+    return model;
   });
 
+  Restangular.extendModel('users', function(model){
+    angular.extend(model, User);
+    return model;
+  });
 }]);
 

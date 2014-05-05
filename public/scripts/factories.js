@@ -59,10 +59,9 @@ factories.factory('postManager', ['$rootScope', 'Restangular', function($rootSco
 factories.factory('Post', function(){
 
   function Post(data){
-    angular.extend(this, {
-      // Instance defaults here
-    });
     angular.extend(this, data);
+    this.feedItem = data.feedItem || {};
+    this.relayed  = data.feedItem.relayed || false;
   }
 
   return Post;
@@ -72,8 +71,6 @@ factories.factory('User', ['postManager', function(postManager){
 
   function User(data){
     angular.extend(this, {
-      // Instance defaults here
-
       relayPost: function(post){
         postManager.userRelayPost(this, post);
       },
@@ -81,8 +78,8 @@ factories.factory('User', ['postManager', function(postManager){
       unrelayPost: function(post){
         postManager.userUnrelayPost(this, post);
       }
-
     });
+
     angular.extend(this, data);
   }
 
