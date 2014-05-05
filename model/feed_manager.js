@@ -124,6 +124,10 @@ var FeedManager = {
     client.exists(this.userFeedItemKey(userID, itemID), callback);
   },
 
+  /**
+   * Gets user's feed.
+   * Valid options are: IDS_ONLY
+   */
   getUserFeedPosts: function(user, callback, options){
     var self = this;
     var key = this.userFeedKey(user);
@@ -201,7 +205,6 @@ var FeedManager = {
 
   sendNewPostToConnections: function(sender, post, connections, callback){
     var feedItem = new FeedItem({
-      relayed        : true,
       postID         : getObjectID(post),
       senderID       : getObjectID(sender)
     });
@@ -217,7 +220,6 @@ var FeedManager = {
       // If no item exists, user doesn't have the post in their feed, short circuit
       if (isStrict && !prevItem) return callback(new Error("User does not have post in their feed!"), null);
       var feedItem = new FeedItem({
-        relayed        : true,
         postID         : getObjectID(post),
         senderID       : getObjectID(user),
         prevSenderID   : (prevItem) ? prevItem.senderID : getObjectID(user),
