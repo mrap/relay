@@ -8,6 +8,8 @@ var FIELD = {
   RELAYED     : "relayed"
 };
 
+var INITIAL_SCORE = 100;
+
 
 // Prioritizes FIELD properties as attribute values
 var FeedItem = function FeedItem(attrs){
@@ -29,7 +31,7 @@ var FeedItem = function FeedItem(attrs){
   this.relayed =
     (!attrs.relayed || attrs.relayed === 'false') ? false : true;
 
-  this.score = attrs.score || 0;
+  this.score = attrs.score || INITIAL_SCORE;
 
   this.originDistance =
     attrs[FIELD.ORIGIN_DIST] ||
