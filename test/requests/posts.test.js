@@ -27,6 +27,7 @@ describe("Post Requests", function(){
 
     describe("with authenticated user", function(){
       beforeEach(function(done){
+        // Authenticate User
         agent
           .post('/login')
           .set('Accept', 'application/x-www-form-urlencoded')
@@ -34,6 +35,8 @@ describe("Post Requests", function(){
           .end(function (err,res){
             if (err) return done(err);
             cookie = res.headers['set-cookie'];
+
+            // Submit relay request
             agent
               .post('/posts/'+post.id+'/relay')
               .set('cookie', cookie)
@@ -55,6 +58,29 @@ describe("Post Requests", function(){
         Post.findById(post, function(err, p){
           eqObjectIDs(p._last_relayed_by, user).should.be.true;
           done();
+        });
+      });
+
+
+      describe("POST #/:id/unrelay", function(){
+        beforeEach(function(done){
+          agent
+            .post('/posts/'+post.id+'/unrelay')
+            .set('cookie', cookie)
+            .send({relayer: user.id})
+            .expect(200, function(err, res){
+              if (err) return done(err);
+              body = res.body;
+              done();
+            });
+        });
+
+        it("successfully unrelays the post", function(done){
+          FeedManager.getUserFeedItem(user, post, function(err, feedItem){
+            if (err) return done(err);
+            expect(feedItem.relayed).to.be.false;
+            done();
+          });
         });
       });
     });

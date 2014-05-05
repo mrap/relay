@@ -2,7 +2,7 @@
 
 var directives = angular.module('relay.directives', []);
 
-directives.directive('feed', ['feedManager', function(feedManager){
+directives.directive('feed', ['$rootScope', 'feedManager', function($rootScope, feedManager){
   function link(scope, element, attrs){
 
     scope.$watch('posts', function(){
@@ -14,6 +14,11 @@ directives.directive('feed', ['feedManager', function(feedManager){
         scope.posts = feedManager.getPopularPosts();
       }
     }
+
+    scope.toggleRelayPost = function(post) {
+      if (post.relayed) $rootScope.currentUser.unrelayPost(post);
+      else              $rootScope.currentUser.relayPost(post);
+    };
   }
   return { link: link }
 }]);

@@ -6,5 +6,5 @@ controllers.controller('AppController', ['$scope', 'userManager', function($scop
   userManager.setCurrentUser();
 }]);
 
-controllers.controller('PostsController', ['$scope', function(scope){
+controllers.controller('FeedController', ['$scope', function(scope){
 }]);

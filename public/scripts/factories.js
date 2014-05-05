@@ -5,14 +5,16 @@ var factories = angular.module('relay.factories', [
 ]);
 
 factories.factory('feedManager', ['Restangular', function(Restangular){
+
   return {
     getPopularPosts: function(){
-      return Restangular.one('posts').customGETLIST('popular').$object;
+      return Restangular.all('posts').customGETLIST('popular').$object;
     }
   };
+
 }]);
 
-factories.factory('userManager', ['$rootScope', 'Restangular', 'GuestUser', 'User', 
+factories.factory('userManager', ['$rootScope', 'Restangular', 'GuestUser', 'User',
                   function($rootScope, Restangular, GuestUser, User){
 
   return {
@@ -30,8 +32,6 @@ factories.factory('userManager', ['$rootScope', 'Restangular', 'GuestUser', 'Use
 
 factories.factory('postManager', ['$rootScope', 'Restangular', function($rootScope, Restangular){
 
-  var basePosts = Restangular.all('posts');
-
   return {
     userRelayPost: function(user, post){
       Restangular.one('posts', post._id)
@@ -41,16 +41,26 @@ factories.factory('postManager', ['$rootScope', 'Restangular', function($rootSco
         }, function(){
           console.error("Error: userRelayPost unsuccessful");
         });
+    },
+
+    userUnrelayPost: function(user, post){
+      Restangular.one('posts', post._id)
+        .post('unrelay', {relayer: user._id} )
+        .then(function(){
+          console.log("userUnrelayPost successful");
+        }, function(){
+          console.error("Error: userRelayPost unsuccessful");
+        });
     }
   };
 
 }]);
 
-factories.factory('Post', function(postManager){
+factories.factory('Post', function(){
 
   function Post(data){
     angular.extend(this, {
-      // Instance defaults
+      // Instance defaults here
     });
     angular.extend(this, data);
   }
@@ -62,10 +72,16 @@ factories.factory('User', ['postManager', function(postManager){
 
   function User(data){
     angular.extend(this, {
-      // Instance defaults
+      // Instance defaults here
+
       relayPost: function(post){
         postManager.userRelayPost(this, post);
+      },
+
+      unrelayPost: function(post){
+        postManager.userUnrelayPost(this, post);
       }
+
     });
     angular.extend(this, data);
   }
@@ -86,6 +102,7 @@ factories.factory('GuestUser', ['User', function(User){
     angular.extend(this, User);
     // Override User relayPost function
     this.relayPost = this.deferRelay;
+    this.unrelayPost = this.deferRelay;
   }
 
   return GuestUser;

@@ -8,5 +8,5 @@
 .post-body(ng-include="'partials/'+ post._type")
 
 .post-controls
-  button(ng-click="currentUser.relayPost(post)")
-    | Relay
+  button.btn.btn-primary(type="button" ng-model="post.relayed" ng-click="toggleRelayPost(post)" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false")
+    | {{ post.relayed ? "Un-relay" : "Relay" }}
