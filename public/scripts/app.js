@@ -20,9 +20,8 @@ app.run(['Restangular', 'Post', 'User', function(Restangular, Post, User){
     angular.extend(model, Post);
     return model;
   });
-
-  Restangular.extendModel('users', function(model){
-    angular.extend(model, User);
+  Restangular.extendModel('feed', function(model){
+    angular.extend(model, Post);
     return model;
   });
 }]);

@@ -9,6 +9,10 @@ factories.factory('feedManager', ['Restangular', function(Restangular){
   return {
     getPopularPosts: function(){
       return Restangular.all('posts').customGETLIST('popular').$object;
+    },
+
+    getUserFeed: function(user){
+      return Restangular.one("users", user._id).customGETLIST('feed').$object;
     }
   };
 

@@ -136,6 +136,7 @@ var FeedManager = {
       if (err) return callback(err, null);
       if (options.IDS_ONLY) return callback(null, postIDs);
 
+      var Post = require('mongoose').model('Post');
       // Get posts from MongoDB
       Post.findByIds(postIDs, null, function(err, dbPosts){
         if (err) return callback(err, null);

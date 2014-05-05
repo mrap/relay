@@ -10,7 +10,7 @@ controllers.controller('HomeFeedController', ['$rootScope', '$scope', 'feedManag
 
     $rootScope.$watch('isUserLoggedIn', function(){
       if (!$rootScope.isUserLoggedIn) $scope.posts = feedManager.getPopularPosts();
-      else                            $scope.posts = $rootScope.currentUser.getFeed();
+      else                            $scope.posts = feedManager.getUserFeed($rootScope.currentUser);
     }, true);
 
     $scope.toggleRelayPost = function(post) {
