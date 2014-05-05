@@ -3,4 +3,5 @@ extends layout
 block content
   .jumbotron
     h1 Relay
-  div(ng-include src="'partials/feed'")
+  div(ng-controller="HomeFeedController")
+    div(ng-include src="'partials/feed'")
