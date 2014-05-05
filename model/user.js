@@ -138,6 +138,8 @@ userSchema.methods.relayOwnPost = function(post, next){
 
 userSchema.methods.relayOtherPost = function(post, next){
   var user = this;
+
+  // Ensure post is a model instance, else go grab it from the db
   if (post.constructor.name !== 'model') {
     var Post = mongoose.model('Post');
     return Post.findById(post, function(err, p){
@@ -145,20 +147,25 @@ userSchema.methods.relayOtherPost = function(post, next){
       user.relayOtherPost(p, next);
     });
   };
-  user.getConnections(function(err, connections){
-    if (err) return next(err, null);
+
+  // TODO: Refactor this logic into FeedManager (event-driven code)
+  // 1. Mark as 'relayed'
+  FeedManager.updateUserPostFeedItemAttributeValue(user, post, 'relayed', true, function(err, res){
+    if (err) return done(err, null);
 
     // 1. Send post to connections
-    FeedManager.sendExistingPostToConnections(user, post, connections, function(err, res){
+    user.getConnections(function(err, connections){
       if (err) return next(err, null);
-
-      // 2. Update post's '_last_relayed_by' field
-      // TODO: check and handle case where post is a ObjectID
-      post.update({_last_relayed_by: user, $inc: {__relay_count: 1} }, function(err, res){
+      FeedManager.sendExistingPostToConnections(user, post, connections, function(err, res){
         if (err) return next(err, null);
-        next(null, post);
+
+        // 2. Update post's '_last_relayed_by' field
+        post.update({_last_relayed_by: user, $inc: {__relay_count: 1} }, function(err, res){
+          if (err) return next(err, null);
+          next(null, post);
+        });
+        EventsMonitor.emit("userRelayedPost", null, user, post);
       });
-      EventsMonitor.emit("userRelayedPost", null, user, post);
     });
   });
 };
