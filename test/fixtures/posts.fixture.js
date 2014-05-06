@@ -9,7 +9,7 @@ var Fixture = {
     var Model = Post;
     if (type == 'link_post') Model = LinkPost;
 
-    Factory.build(type, function(err, attrs){
+    Factory.build(type, attrs, function(err, attrs){
       if (err) return next(err, null);
       if (user) return Model.createByUser(attrs, user, next);
       Factory.create('User', function(err, newUser){

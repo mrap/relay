@@ -4,7 +4,8 @@ var PostSchema = require('./post')
   , extend     = require('mongoose-schema-extend');
 
 var LinkPostSchema = PostSchema.extend({
-  link: { type: String, required: true }
+  link:          { type: String, required: true },
+  is_media: { type: Boolean, default: false }
 });
 
 mongoose.model('link_post', LinkPostSchema);
