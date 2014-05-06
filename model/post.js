@@ -57,7 +57,6 @@ postSchema.statics.createByUser = function(attrs, user, callback){
       callback(null, post);
     });
   });
-  return newPost;
 };
 
 postSchema.statics.findByIds = function(ids, options, next){
