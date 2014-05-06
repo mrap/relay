@@ -2,7 +2,7 @@ var mongoose    = require('mongoose')
   , PostFixture = require('./posts.fixture')
   , Factory     = require('../factories');
 
-// Each connected user will be x distance away from base user.
+// Each connected user will be x distance away from base user. (performs in descending order)
 // Each connected user will post exactly once.
 module.exports.UserWithConnectionsAndFeed = function(userAttrs, connectionsCount, next){
   /*** Setup ***/

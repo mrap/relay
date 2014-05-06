@@ -57,6 +57,12 @@ describe("User Requests", function(){
           done();
         });
       });
+
+      it("should return posts sorted by score (greatest to smallest)", function(){
+        for(var i = 1; i < body.length; i++) {
+          expect(body[i].feedItem.score).to.be.at.most(body[i-1].feedItem.score);
+        }
+      });
     });
   });
 });
