@@ -1,5 +1,12 @@
 $feed-indent: 20px;
 
+#feed-header {
+  .header {
+    font-family: "Avenir Next", sans-serif;
+    font-weight: 700;
+  }
+}
+
 .post {
   height: 100px;
   margin: 10px;
