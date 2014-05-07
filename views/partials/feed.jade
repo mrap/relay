@@ -1,12 +1,20 @@
 // First 'post' is always the user's avatar
-.feed.row
-  .post.col-sm-6.col-xs-12#feed-header
-    .post-body
-      h2.header {{ isUserLoggedIn ? currentUser.username : "Start by relaying posts you like" }}
+.feed
+  // .post.col-sm-6.col-xs-12#feed-header
+  //   .post-body
+  //     h2.header {{ isUserLoggedIn ? currentUser.username : "Start by relaying posts you like" }}
 
-  .post.col-sm-6.col-xs-12(ng-repeat='post in posts' ng-class="{'media-post': post.is_media}")
+  .post(ng-repeat='post in posts' ng-class="{'media-post': post.is_media}")
+
     .post-body
-      .content
-        | {{post.content}}
+      p.created
+        | Created {{ post.relay_count }} users away
+      .headline
+        | {{ post.headline }}
         | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
+
+    // .post-controls
+    //   button.btn.btn-primary(type="button" ng-model="post.relayed" ng-click="toggleRelayPost(post)" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false")
+    //     | {{ post.relayed ? "Un-relay" : "Relay" }}
+
 

@@ -1,0 +1,29 @@
+.feed {
+  position: relative;
+}
+
+.post {
+  position: relative;
+  background-color: darkgray;
+  box-shadow: 0px 3px 5px rgba(0,0,0,0.5);
+  margin-bottom: 30px;
+
+}
+
+.post-body {
+  height: 100%;
+  padding: 20px;
+  background: white;
+
+  .created {
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 200;
+    font-size: 0.8em;
+  }
+
+  .headline {
+    color: black;
+    font-family: "Museo Sans", sans-serif;
+    font-weight: 500;
+  }
+}

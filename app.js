@@ -20,11 +20,11 @@ app.set('view engine', 'jade');
 
 app.use(favicon());
 app.use(logger('dev'));
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(require('node-compass')({mode: 'expanded'}));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: config.session.secret, cookie: { maxAge: 60000 } }));
 app.use(flash());
 app.use(passport.initialize());
