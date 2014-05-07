@@ -19,7 +19,7 @@ var postSchema    = Schema({
   _author:          { type: Schema.Types.ObjectId, ref: 'User', required: true, select: false },
   _last_relayed_by: { type: Schema.Types.ObjectId, ref: 'User' },
   __relay_count:    { type: Number, default: 0, select: false },
-  content:          { type: String, required: true }
+  headline:         { type: String, required: true }
 }, schemaOptions);
 
 // Note: Temp const.  This will change later in the project.

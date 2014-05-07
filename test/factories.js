@@ -13,12 +13,12 @@ monky.factory('User', {
 
 monky.factory('Post', {
   _author: 'User',
-  content: "This is content"
+  headline: "Post Headline"
 });
 
 monky.factory('link_post', {
   _author: 'User',
-  content: "This is content",
+  headline: "Post Headline",
   link: "http://awesome-link.com"
 });
 
