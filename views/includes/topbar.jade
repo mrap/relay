@@ -1,0 +1,7 @@
+.row.topbar
+  .col-sm-3.header(ng-switch='isUserLoggedIn')
+    div(ng-switch-when='true')
+      .username.current-user {{ currentUser.username }}
+    div(ng-switch-default)
+      | Start by relaying posts you like
+

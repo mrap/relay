@@ -1,14 +1,15 @@
+@import './vars';
 
 // Hide for mobile
-#sidebar {
+.sidebar {
   display: none;
 }
 
 @media (min-width: 768px) {
-  #sidebar {
+  .sidebar {
     display: block;
     position: fixed;
-    top: 0px;
+    top: $topbar-bottom;
     bottom: 0;
     left: 0;
     z-index: 1000;

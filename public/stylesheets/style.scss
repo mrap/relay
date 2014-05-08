@@ -1,5 +1,7 @@
 @import "compass/css3";
 @import "../lib/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap";
+@import "./vars";
+@import "./topbar";
 @import "./sidebar";
 @import "./post";
 
@@ -14,4 +16,8 @@ a {
 
 .username {
   text-transform: uppercase;
+}
+
+.content-container {
+  margin-top: $topbar-bottom;
 }

@@ -1,0 +1,16 @@
+@import './vars';
+
+.topbar {
+  position: fixed;
+  top: $top-padding;
+  min-height: $topbar-height;
+  width: 100%;
+  z-index: 1000;
+  background-color: black;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+
+  .header {
+    font-size: 1.2em;
+  }
+}

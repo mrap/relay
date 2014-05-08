@@ -4,12 +4,14 @@ html(ng-app="relay")
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="AppController")
-    .container-fluid.row
-      .col-sm-3#sidebar
-        include includes/sidebar
-      #content-container.col-sm-9.col-sm-offset-3
-        include includes/flash_messages
-        block content
+    .container-fluid
+      include includes/topbar
+      .row
+        .col-sm-3.sidebar
+          include includes/sidebar
+        .content-container.col-sm-9.col-sm-offset-3
+          include includes/flash_messages
+          block content
 
   script(src='/lib/angular/angular.js')
   script(src='/lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap.js')
