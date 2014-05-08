@@ -3,7 +3,7 @@
 .topbar {
   position: fixed;
   top: $top-padding;
-  min-height: $topbar-height;
+  height: $topbar-height;
   width: 100%;
   z-index: 1000;
   background-color: black;
@@ -17,6 +17,10 @@
   form {
     position: fixed;
     top: $top-padding;
+  }
+
+  .small {
+    color: gray;
   }
 }
 

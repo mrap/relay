@@ -4,6 +4,9 @@
       .username.current-user {{ currentUser.username }}
     div(ng-switch-default)
       | Start by relaying posts you like
+      p.small
+        | or 
+        a(ng-href='/login') Login
   .col-sm-9.col-sm-offset-3
     form.form-inline(role='form' ng-if='isUserLoggedIn' new-post-form)
       .form-group
