@@ -8,7 +8,9 @@ var key                   = require('./redis_key')
   , bcrypt                = require('bcrypt')
   , FeedManager           = require('./feed_manager')
   , EventsMonitor         = require('./events_monitor')
-  , config                = require('../config');
+  , config                = require('../config')
+  , helpers               = require('../lib/global_helpers')
+  , getObjectID           = helpers.getObjectID;
 
 /*** Encryption ***/
 var generateHash = function(data, callback){
@@ -260,8 +262,10 @@ userSchema.statics.feedKeyForID = function(id){
  * callback returns (error, post, user)
  */
 userSchema.statics.addPost = function(id, post, callback){
+  id = getObjectID(id);
   this.findById(id).exec( function(err, user){
     if (err) return callback(err, null, null);
+    if (!user) return callback(new Error("User with id "+id+" does not exist."), null, null);
     if (user.posts.indexOf(post._id) !== -1) return callback(new Error("User already has post: " + post), null, null);
     user.posts.push(post._id);
     user.save(function(err){
