@@ -39,6 +39,18 @@ LinkPostSchema.statics.getPreviewPhotoUrl = function(url, done) {
   });
 };
 
+var httpProtocolExp = new RegExp("^http*");
+var urlWithProtocol = function(url){
+  return !httpProtocolExp.test(url) ? "http://"+url : url;
+};
+
+/* Ensure http protocol */
+LinkPostSchema.pre('save', function(next){
+  var post = this;
+  post.link = urlWithProtocol(post.link);
+  next();
+});
+
 LinkPostSchema.statics.updatePostPreviewPhotoUrl = function(post, done) {
   var Model = this;
 

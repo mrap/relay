@@ -19,7 +19,7 @@ monky.factory('Post', {
 monky.factory('link_post', {
   _author: 'User',
   headline: "Post Headline",
-  link: "http://awesome-link.com"
+  link: "awesome-link.com"
 });
 
 module.exports = monky;
