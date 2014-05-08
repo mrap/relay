@@ -1,6 +1,8 @@
 // First 'post' is always the user's avatar
 .feed
   .post(ng-repeat='post in posts' ng-class="{'media-post': post.is_media}")
+    .post-photo-preview(ng-if='post.preview_photo_url')
+      img(ng-src='{{ post.preview_photo_url }}')
     .post-body
       p.created
         | Post created {{ post.relay_count }} connections away

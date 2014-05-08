@@ -13,4 +13,10 @@
   .header {
     font-size: 1.2em;
   }
+
+  form {
+    position: fixed;
+    top: $top-padding;
+  }
 }
+
