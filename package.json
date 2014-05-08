@@ -31,7 +31,8 @@
     "passport-local": "^1.0.0",
     "redis": "~0.10.1",
     "request": "^2.34.0",
-    "static-favicon": "~1.0.0"
+    "static-favicon": "~1.0.0",
+    "underscore": "^1.6.0"
   },
   "devDependencies": {
     "monky": "~0.3.1",

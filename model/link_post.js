@@ -54,7 +54,11 @@ LinkPostSchema.statics.updatePostPreviewPhotoUrl = function(post, done) {
 
   Model.getPreviewPhotoUrl(post.link, function(err, photoUrl){
     if (err) return done(err);
-    Model.findByIdAndUpdate(post.id,{ preview_photo_url: photoUrl }, done);
+    Model.findByIdAndUpdate(post.id,{ preview_photo_url: photoUrl }, function(err, res){
+      if (err) return done(err);
+      post.preview_photo_url = photoUrl;
+      done(null, post);
+    });
   });
 };
 

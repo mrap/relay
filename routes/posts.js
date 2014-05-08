@@ -4,13 +4,46 @@ var express  = require('express')
   , router   = express.Router()
   , mongoose = require('mongoose')
   , Post     = mongoose.model('Post')
-  , User     = mongoose.model('User');
+  , LinkPost = mongoose.model('link_post')
+  , User     = mongoose.model('User')
+  , _        = require('underscore');
+
+var VALID_POST_ATTRS = ['_author', 'headline', 'link'];
+
+var filterPostAttrs = function(attrs){
+  return _.pick(attrs, VALID_POST_ATTRS);
+};
 
 /* GET popular posts */
 router.get('/popular', function(req, res) {
   Post.getPopularPosts(0, 20, function(err, posts){
     if (err) throw err;
     res.json(posts);
+  });
+});
+
+/* POST create a post */
+router.post('/', function(req, res){
+  if (!req.isAuthenticated()) return res.send(401);
+
+  var type      = req.body.post_type ? req.body.post_type.toLowerCase() : 'post'
+    , Model     = Post
+    , postAttrs = filterPostAttrs(req.body)
+    , authorID  = req.user.id;
+
+  // Use the right Post model type
+  if (type === 'link_post' || type === 'linkpost') Model = LinkPost;
+
+  Model.createByUser(postAttrs, authorID, function(err, post){
+    if (err) throw err;
+    res.json(post);
+
+    // Update the link_posts preview_photo_url
+    if (Model === LinkPost) {
+      Model.updatePostPreviewPhotoUrl(post, function(err){
+        if (err) throw err;
+      });
+    }
   });
 });
 

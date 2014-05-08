@@ -25,6 +25,7 @@ before(function(done){
     ScenarioFixture       = require('./fixtures/scenarios.fixture');
     Factory               = require('./factories');
     integrationHelpers    = require('./integration/helpers');
+    _                     = require('underscore');
     done();
   });
 });
