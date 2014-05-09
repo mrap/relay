@@ -9,14 +9,19 @@
   background-color: black;
   background-color: rgba(0,0,0,0.8);
   color: white;
+  display: table;
+
+  .inner-topbar {
+    display: table-cell;
+    vertical-align: middle;
+  }
 
   .header {
     font-size: 1.2em;
   }
 
-  form {
-    position: fixed;
-    top: $top-padding;
+  .username {
+    font-size: 1.3em;
   }
 
   .small {
