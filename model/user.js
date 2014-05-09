@@ -132,8 +132,11 @@ userSchema.methods.relayOwnPost = function(post, next){
     if (err) return next(err, null);
     FeedManager.sendNewPostToConnections(user, post, connections, function(err, res){
       if (err) return next(err, null);
-      EventsMonitor.emit("userCreatedPost", null, user, post);
-      next(null, res);
+      FeedManager.addPostToUserFeed(post, user, function(err, res){
+        if (err) return next(err, null);
+        next(null, post);
+        EventsMonitor.emit("userCreatedPost", null, user, post);
+      });
     });
   });
 };

@@ -1,12 +1,13 @@
 describe("Post Model", function(){
   var post = null;
   var user = null;
+  var connectionCount = 3;
 
   // Create the user
   beforeEach(function(done){
-    UserFixture.createUserWithConnections({}, 3, 10, function(err, res){
+    ScenarioFixture.UserWithConnectionsAndFeed({}, connectionCount, function(err, u, extra){
       if (err) return done(err);
-      user = res;
+      user = u;
       PostFixture.createByUserWithType(null, user, null, function(err, p){
         if (err) return done(err);
         post = p;
@@ -31,6 +32,24 @@ describe("Post Model", function(){
       })
     })
 
+    it("should save to author's feed as the highest ranked item", function(done){
+      FeedManager.getUserFeedItem(user, post, function(err, res){
+        if (err) return done(err);
+        expect(res).to.exist;
+        var postScore = res.score;
+        FeedManager.getUserFeedPosts(user, function(err, posts){
+          if (err) return done(err);
+          for(var i = 0; i<posts.length; i++) {
+            var currentPost = posts[i];
+            if (eqObjectIDs(currentPost, post)) continue;
+            expect(currentPost.feedItem.score).to.be.at.gte(postScore);
+          }
+          done();
+        });
+      });
+    });
+
+
     it("should save to each author's connection's feed", function(done){
       User.getConnectedUsers(user, function(err, users){
         var otherUser     = null;
@@ -49,10 +68,13 @@ describe("Post Model", function(){
   })
 
   it("should add post to `popular posts`", function(done){
-    Post.getPopularPosts(0, 10, function(err, posts){
-      containsObject(posts, post).should.be.true;
-      done();
-    });
+    // wait for Events Monitor to update popular posts
+    setTimeout(function(){
+      Post.getPopularPosts(0, 10, function(err, posts){
+        containsObject(posts, post).should.be.true;
+        done();
+      });
+    }, 1000);
   });
 
   describe("when a post is relayed", function(){

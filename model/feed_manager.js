@@ -1,8 +1,11 @@
 var client                = require('./redis_client')
   , key                   = require('./redis_key')
   , FeedItem              = require('./feed_item')
-  , getObjectID           = require('../lib/global_helpers').getObjectID
-  , UserConnectionManager = require('./user_connection_manager');
+  , helpers               = require('../lib/global_helpers')
+  , getObjectID           = helpers.getObjectID
+  , eqObjectIDs           = helpers.eqObjectIDs
+  , UserConnectionManager = require('./user_connection_manager')
+  , socialSettings        = require('../config').socialSettings;
 
 // Redis fields
 var FIELD = {
@@ -155,6 +158,30 @@ var FeedManager = {
     });
   },
 
+  /**
+   * Returns the highest feedItem score
+   * Lower is higher rank
+   * If no feedItems, returns MIN_POST_SCORE
+   */
+  getHighestRankScoreInUserFeed: function(user, done){
+    var offset = 0
+      , count  = 1
+      , args   = [ this.userFeedKey(user),
+                   '+inf',
+                   '-inf',
+                   'WITHSCORES',
+                   'LIMIT',
+                   offset,
+                   count];
+
+    client.ZRANGEBYSCORE(args, function(err, res){
+      if (err) return done(err, null);
+      // result => [id, score, id, ...]
+      var score = res[1] || socialSettings.MIN_POST_SCORE;
+      done(null, Number(score) );
+    });
+  },
+
   getFeedPostIDsForKey: function(key, callback){
     var self = this;
     var args = [key, 0, -1];
@@ -162,19 +189,53 @@ var FeedManager = {
   },
 
   getUserFeedItem: function(userID, postID, callback){
+    var self = this;
     userID = getObjectID(userID);
     postID = getObjectID(postID);
-    client.hgetall(this.userFeedItemKey(userID, postID), function(err, res){
+    client.HGETALL(self.userFeedItemKey(userID, postID), function(err, res){
       if (err)  return callback(err, null);
       if (!res) return callback(null, null);
-      var feedItem = new FeedItem({
+
+      client.ZSCORE(self.userFeedKey(userID), postID, function(err, score){
+        if (err)  return callback(err, null);
+        var feedItem = new FeedItem({
           postID         : postID,
           relayed        : res.relayed,
           senderID       : res.sender,
           prevSenderID   : res.prevSender,
-          originDistance : res.origin_dist });
+          originDistance : res.origin_dist,
+          score          : score
+        });
+        callback(null, feedItem);
+      })
+    });
+  },
 
-      callback(null, feedItem);
+  addPostToUserFeed: function(post, user, done){
+    var FeedManager = this
+      , userID = getObjectID(user);
+
+    if(!userID) return done(new Error("Requires a valid user or user id"), null);
+    // Get the highest ranked feedItem score
+    // This feed item must be the currently highest ranked item on the user's feed
+    FeedManager.getHighestRankScoreInUserFeed(user, function(err, score){
+      if (err) return done(err, null);
+
+      var feedItem = new FeedItem({
+        postID         : getObjectID(post),
+        relayed        : true,
+        senderID       : userID,
+        prevSenderID   : userID,
+        score          : Math.max(score-socialSettings.ADJ_POST_SCORE, socialSettings.MIN_POST_SCORE)
+      });
+
+      // Save to feed
+      client
+        .multi(FeedManager.__addFeedItemCommands(userID, feedItem))
+        .exec(function(err, res){
+          if (err) return done(err, null);
+          done(null, feedItem);
+        });
     });
   },
 
@@ -186,7 +247,10 @@ var FeedManager = {
     // Builds a multi redis transaction for each connection.
     for(var i=count-1; i>=0; i--){
       var connection = connections[i];
-      commands = commands.concat(this.__addFeedItemCommands(connection.target, feedItem));
+      // Adjust feedItem for each connection
+      var currentItem = feedItem;
+      currentItem.score = connection.distance;
+      commands = commands.concat(self.__addFeedItemCommands(connection.target, currentItem));
     } client.multi(commands).exec(function(err, res) {
       if (err) return callback(err, null);
 
@@ -207,7 +271,8 @@ var FeedManager = {
   sendNewPostToConnections: function(sender, post, connections, callback){
     var feedItem = new FeedItem({
       postID         : getObjectID(post),
-      senderID       : getObjectID(sender)
+      senderID       : getObjectID(sender),
+      prevSenderID   : getObjectID(sender)
     });
     this.sendItemToConnections(feedItem, connections, callback);
   },
@@ -224,19 +289,20 @@ var FeedManager = {
         postID         : getObjectID(post),
         senderID       : getObjectID(user),
         prevSenderID   : (prevItem) ? prevItem.senderID : getObjectID(user),
-        originDistance : (prevItem) ? prevItem.originDistance+1 : 1
+        originDistance : (prevItem) ? prevItem.originDistance+1 : socialSettings.MIN_CONNECTION_DISTANCE
       });
 
       // 1. Send item to connections
       self.sendItemToConnections(feedItem, connections, function(err, res){
         if (err) return callback(err, null);
-        // If no prevItem, we can stop here.
-        if (!prevItem) return callback(null, res);
 
         // 2. Connect user to prevSender of prevItem
         // Dist = distTo sender + dist between sender and prevSender
         var sender = prevItem.senderID;
         var prevSender = prevItem.prevSenderID;
+        // If no prevItem or user is sender, we can stop here.
+        if (!prevItem || eqObjectIDs(user, sender)) return callback(null, res);
+
         UserConnectionManager.getDistanceBetweenUsers(user, sender, function(err, distToSender){
           UserConnectionManager.getDistanceBetweenUsers(sender, prevSender, function(err, distSenderToPrevSender){
             var dist = distToSender + distSenderToPrevSender;

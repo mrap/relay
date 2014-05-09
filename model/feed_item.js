@@ -8,8 +8,7 @@ var FIELD = {
   RELAYED     : "relayed"
 };
 
-var INITIAL_SCORE = 100;
-
+var INITIAL_DISTANCE = 1;
 
 // Prioritizes FIELD properties as attribute values
 var FeedItem = function FeedItem(attrs){
@@ -31,15 +30,14 @@ var FeedItem = function FeedItem(attrs){
   this.relayed =
     (!attrs.relayed || attrs.relayed === 'false') ? false : true;
 
-  this.score = attrs.score || INITIAL_SCORE;
+  this.score = attrs.score ? Number(attrs.score) : null;
 
   this.originDistance =
     attrs[FIELD.ORIGIN_DIST] ||
     attrs.originDistance     ||
-    1;
+    INITIAL_DISTANCE;
 
   // Convert strings to numbers and bools
-  this.score          = Number(this.score);
   this.originDistance = Number(this.originDistance);
 
   return this;
