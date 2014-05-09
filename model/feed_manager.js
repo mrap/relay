@@ -146,7 +146,7 @@ var FeedManager = {
 
         // Assign each post.feedItem
         function assignFeedItem(itr){
-          if (itr === dbPosts.length) return callback(null, dbPosts);
+          if (itr === dbPosts.length) return callback(null, dbPosts.sort(self.dbPostsCompareFn));
           self.getUserFeedItem(user, dbPosts[itr], function(err, feedItem){
             if (err) return callback(err, null);
             dbPosts[itr].feedItem = feedItem;
@@ -156,6 +156,11 @@ var FeedManager = {
         assignFeedItem(0);
       });
     });
+  },
+
+  // Sort by feedItem score, lowest to highest
+  dbPostsCompareFn: function(a, b){
+    return a.feedItem.score - b.feedItem.score;
   },
 
   /**
