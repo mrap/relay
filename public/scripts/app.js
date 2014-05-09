@@ -5,7 +5,8 @@ var app = angular.module('relay', [
   'relay.factories',
   'relay.services',
   'relay.directives',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'duScroll'
 ]);
 
 app.config(['RestangularProvider', function(RestangularProvider){

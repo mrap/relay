@@ -2,15 +2,23 @@
 
 var directives = angular.module('relay.directives', []);
 
-directives.directive('newPostForm', ['Restangular', function(Restangular){
+directives.directive('newPostForm', ['Restangular', '$document', function(Restangular, $document){
   return function(scope, element, attr) {
     var linkExp = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
     var isLink = function(str){
       return linkExp.test(str);
     };
 
+    /* Simply scrolls to the top for now */
+    var scrollToNewPost = function(){
+      var duration = 1000;
+      $document.scrollTop(0, duration);
+    };
+
     scope.newPostEntry = "";
     var basePostsRoute = Restangular.all('posts');
+
+    /* Submit new post */
     scope.submitNewPost = function(){
       if (!scope.newPostEntry) return;
       var entry = scope.newPostEntry;
@@ -21,6 +29,7 @@ directives.directive('newPostForm', ['Restangular', function(Restangular){
       } else {
         scope.posts.unshift(basePostsRoute.post( {headline: entry} ).$object );
       }
+      scrollToNewPost();
     };
   };
 }]);
