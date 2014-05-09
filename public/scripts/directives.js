@@ -17,9 +17,9 @@ directives.directive('newPostForm', ['Restangular', function(Restangular){
       scope.newPostEntry = ""; // clears form
 
       if (isLink(entry)) {
-          basePostsRoute.post( {post_type: 'link_post', link: entry, headline: entry} );
+        scope.posts.unshift(basePostsRoute.post( {post_type: 'link_post', link: entry, headline: entry} ).$object );
       } else {
-        basePostsRoute.post( {headline: entry} );
+        scope.posts.unshift(basePostsRoute.post( {headline: entry} ).$object );
       }
     };
   };

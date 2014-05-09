@@ -4,7 +4,7 @@ html(ng-app="relay")
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="AppController")
-    .container
+    .container(ng-controller="HomeFeedController")
       include includes/topbar
       .row
         .col-sm-3.sidebar
