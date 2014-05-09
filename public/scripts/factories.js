@@ -64,8 +64,9 @@ factories.factory('Post', function(){
 
   function Post(data){
     angular.extend(this, data);
+    data = data || {};
     this.feedItem = data.feedItem || {};
-    this.relayed  = data.feedItem.relayed || false;
+    this.relayed  = this.feedItem.relayed || data.relayed || false;
   }
 
   return Post;
