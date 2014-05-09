@@ -24,3 +24,24 @@ directives.directive('newPostForm', ['Restangular', function(Restangular){
     };
   };
 }]);
+
+directives.directive('feedTop', function(){
+  return function(scope, element, attrs) {
+    var elem       = element[0]
+      , elemHeight = elem.getBoundingClientRect().height;
+    scope.feedTop  = elem.getBoundingClientRect().top + elemHeight/2;
+  };
+});
+
+directives.directive('postHide', ['$window', function($window){
+  return function(scope, element, attrs) {
+
+    angular.element($window).bind('scroll', function(){
+      var elem = element[0]
+        , elemHeight = elem.getBoundingClientRect().height
+        , elemHideY = elem.getBoundingClientRect().top + elemHeight/2;
+      scope.shouldHide = elemHideY <= scope.feedTop
+      scope.$apply();
+    });
+  };
+}]);
