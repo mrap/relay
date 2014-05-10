@@ -253,6 +253,8 @@ var FeedManager = {
     for(var i=count-1; i>=0; i--){
       var connection = connections[i];
       // Adjust feedItem for each connection
+      //
+      // Set feedItem score to connection distance
       var currentItem = feedItem;
       currentItem.score = connection.distance;
       commands = commands.concat(self.__addFeedItemCommands(connection.target, currentItem));
