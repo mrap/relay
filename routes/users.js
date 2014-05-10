@@ -5,14 +5,14 @@ var express     = require('express')
   , mongoose    = require('mongoose')
   , User        = mongoose.model('User')
   , FeedManager = require('../model/feed_manager')
-  , _        = require('underscore')
-  , passport    = require('../config/passport');
+  , _           = require('underscore')
+  , passport    = require('../config/passport')
+  , formidable = require('formidable');
 
 var VALID_ATTRS = [
   'email',
   'username',
-  'password',
-  'profile_img'
+  'password'
 ];
 
 var filterAttrs = function(attrs){
@@ -42,6 +42,24 @@ router.post('/', function(req, res){
       // Authenticate user
       passport.authenticate('local-signup')(req, res, function(){
         res.json(u);
+      });
+    });
+  });
+});
+
+router.post('/:id/avatar', function(req, res){
+  if (!req.isAuthenticated()) return res.send(401);
+
+  User.findById(req.params.id, function(err, user){
+    if (err) return res.json(500, {error: err});
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files){
+      user.attach('avatar', files.avatar, function(err){
+        if (err) throw err;
+        user.save(function(err){
+          if (err) throw err;
+          res.json(user);
+        });
       });
     });
   });

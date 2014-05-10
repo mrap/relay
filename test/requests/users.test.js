@@ -72,6 +72,7 @@ describe("User Requests", function(){
       username  : "mrap",
       password  : "pass"
     };
+    var userID = null;
 
     beforeEach(function(done){
       agent
@@ -80,6 +81,8 @@ describe("User Requests", function(){
       .expect(200, function(err, res){
         if (err) return done(err);
         body = res.body;
+        userID = body._id; // for dependent tests
+        cookie = res.headers['set-cookie'];
         done();
       });
     });
@@ -95,5 +98,29 @@ describe("User Requests", function(){
       expect(body.username).to.eq(userAttrs.username);
       expect(body.email).to.eq(userAttrs.email);
     });
+
+    describe("then update avatar img", function(){
+      beforeEach(function(done){
+        agent
+          .post('/users/'+userID+'/avatar')
+          .set('cookie', cookie) // auth token
+          .attach('avatar', 'test/fixtures/user_avatar.png')
+          .expect(200, function(err, res){
+            if (err) return done(err);
+            body = res.body;
+            done();
+          });
+      });
+
+      // Skip because it actually saves to s3
+      it.skip("should have uploaded the avatar", function(done){
+        User.findOne({username: userAttrs.username}, function(err, res){
+          console.log(res.avatar_medium_img);
+          expect(res.avatar_medium_img).to.exist;
+          done();
+        });
+      });
+    });
   });
+
 });

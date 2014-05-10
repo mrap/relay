@@ -1,6 +1,6 @@
 var key                   = require('./redis_key')
   , mongoose              = require('mongoose')
-  , attachments           = require('mongoose-attachments-aws2js')
+  , attachments           = require('mongoose-attachments')
   , Schema                = mongoose.Schema
   , UserConnectionManager = require('./user_connection_manager')
   , UserConnection        = require('./user_connection')
@@ -68,7 +68,7 @@ userSchema.virtual('needsEncryption').get(function(){
 userSchema.plugin(attachments, {
   directory: 'users',
   storage: {
-    providerName: 'aws2js',
+    providerName: 's3',
     options: {
       key    : config.s3.key,
       secret : config.s3.secret,
@@ -76,14 +76,20 @@ userSchema.plugin(attachments, {
     }
   },
   properties: {
-    profile_image: {
+    avatar: {
       styles: {
         medium: {
-          resize: '150x150'
+          resize: '150x150',
+          '$format': 'jpg'
         }
       }
     }
   }
+});
+
+/*** Url to attachments ***/
+userSchema.virtual('avatar_medium_img').get(function(){
+  return config.s3.baseUrl+"/users/"+this._id+"-medium.jpg";
 });
 
 /**
