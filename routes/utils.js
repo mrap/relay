@@ -7,8 +7,8 @@ var express     = require('express')
 
 router.get('/getImageUrl', function(req, res){
   LinkPost.getPreviewPhotoUrl(req.query.url, function(err, imageUrl){
-    if (err) throw err;
-    res.json({ url: imageUrl });
+    if (err) return res.json(500, { error: err} );
+    res.json({ url: decodeURIComponent(imageUrl) });
   });
 });
 

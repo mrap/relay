@@ -109,3 +109,35 @@ factories.factory('GuestUser', ['User', function(User){
 
   return GuestUser;
 }]);
+
+factories.factory('urlImageExtractor', ['urlValidator', 'Restangular', function(urlValidator, Restangular){
+  return {
+    fetchImageUrlFromUrl: function(url, done){
+      url = urlValidator.normalizedUrl(url);
+      var encodedUrl = encodeURIComponent(url);
+      Restangular
+        .one('utils')
+        .customGET('getImageUrl', {url: encodedUrl} )
+        .then(function(res){
+          console.log(res.url);
+          done(res.url);
+        });
+    }
+  };
+}]);
+
+factories.factory('urlValidator', function(){
+  var linkExp         = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
+    , httpProtocolExp = new RegExp("^https?://*");
+
+  return {
+    isUrl: function(str){
+      return linkExp.test(str);
+    },
+
+    normalizedUrl: function(url){
+      if (!this.isUrl(url)) return null;
+      return !httpProtocolExp.test(url) ? "http://"+url : url;
+    }
+  };
+});

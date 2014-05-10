@@ -8,7 +8,12 @@ var express  = require('express')
   , User     = mongoose.model('User')
   , _        = require('underscore');
 
-var VALID_POST_ATTRS = ['_author', 'headline', 'link'];
+var VALID_POST_ATTRS = [
+  '_author',
+  'headline',
+  'link',
+  'preview_photo_url'
+];
 
 var filterPostAttrs = function(attrs){
   return _.pick(attrs, VALID_POST_ATTRS);

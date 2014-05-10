@@ -25,7 +25,7 @@ LinkPostSchema.pre('save', function(next){
 LinkPostSchema.statics.getPreviewPhotoUrl = function(url, done) {
   var request    = require('request')
     , cheerio    = require('cheerio')
-    , decodedUrl = decodeURIComponent(url);
+    , decodedUrl = urlWithProtocol(decodeURIComponent(url));
 
   request(decodedUrl, function(err, res, body){
     if (err) return done(err, null);
