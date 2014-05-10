@@ -4,7 +4,11 @@
     .post-photo-preview(ng-if='post.preview_photo_url')
       img(ng-src='{{ post.preview_photo_url }}')
     .post-body
-      img.img-circle.relayer-avatar(ng-src="{{ post.relayer.avatar.small.defaultUrl }}")
+      .relayer
+        .info
+          .username(ng-bind='post.relayer.username')
+          .action relayed
+        img.img-circle.avatar(ng-src="{{ post.relayer.avatar.small.defaultUrl }}")
       .post-body-content
         p.created
           | Post created {{ post.relay_count }} connections away
