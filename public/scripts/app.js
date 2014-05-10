@@ -6,7 +6,9 @@ var app = angular.module('relay', [
   'relay.services',
   'relay.directives',
   'ui.bootstrap',
-  'duScroll'
+  'duScroll',
+  'ngAnimate',
+  'fx.animations'
 ]);
 
 app.config(['RestangularProvider', function(RestangularProvider){

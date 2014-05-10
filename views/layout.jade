@@ -2,6 +2,7 @@ doctype html
 html(ng-app="relay")
   head
     title= title
+    meta(content='width=device-width, initial-scale=1.0' name='viewport')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="AppController")
     .container-fluid(ng-controller="HomeFeedController")
@@ -14,8 +15,11 @@ html(ng-app="relay")
           block content
 
   script(src='/lib/angular/angular.js')
+  script(src='/lib/angular-animate/angular-animate.js')
   script(src='/lib/bootstrap-sass-official/vendor/assets/javascripts/bootstrap.js')
   script(src='/lib/angular-bootstrap/ui-bootstrap.js')
+  script(src='/lib/gsap/src/uncompressed/TweenMax.js')
+  script(src='/lib/ng-Fx/dist/ng-Fx.js')
   script(src='/lib/lodash/dist/lodash.js')
   script(src='/lib/angular-scroll/angular-scroll.js')
   script(src='/lib/restangular/dist/restangular.js')

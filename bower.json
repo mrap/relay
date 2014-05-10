@@ -22,6 +22,9 @@
     "angular": "~1.2.16",
     "restangular": "~1.4.0",
     "angular-bootstrap": "~0.11.0",
-    "angular-scroll": "~0.5.5"
+    "angular-scroll": "~0.5.5",
+    "ng-Fx": "~0.4.0",
+    "gsap": "~1.11.7",
+    "angular-animate": "~1.2.16"
   }
 }
