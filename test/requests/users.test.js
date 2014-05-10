@@ -65,4 +65,35 @@ describe("User Requests", function(){
       });
     });
   });
+
+  describe("Create new user", function(){
+    var userAttrs = {
+      email     : "mike@mrap.me",
+      username  : "mrap",
+      password  : "pass"
+    };
+
+    beforeEach(function(done){
+      agent
+      .post('/users')
+      .send(userAttrs)
+      .expect(200, function(err, res){
+        if (err) return done(err);
+        body = res.body;
+        done();
+      });
+    });
+
+    it("should create the user", function(done){
+      User.findOne({username: userAttrs.username}, function(err, res){
+        expect(res).to.exist;
+        done();
+      });
+    });
+
+    it("should return the user", function(){
+      expect(body.username).to.eq(userAttrs.username);
+      expect(body.email).to.eq(userAttrs.email);
+    });
+  });
 });
