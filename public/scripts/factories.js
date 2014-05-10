@@ -128,11 +128,16 @@ factories.factory('urlImageExtractor', ['urlValidator', 'Restangular', function(
 
 factories.factory('urlValidator', function(){
   var linkExp         = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
-    , httpProtocolExp = new RegExp("^https?://*");
+    , httpProtocolExp = new RegExp("^https?://.+")
+    , wwwExp          = new RegExp("^www\..+");
+
+  var hasHost = function(url){
+    return wwwExp.test(url) || httpProtocolExp.test(url);
+  };
 
   return {
     isUrl: function(str){
-      return linkExp.test(str);
+      return hasHost(str) && linkExp.test(str);
     },
 
     normalizedUrl: function(url){
