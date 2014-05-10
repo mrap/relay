@@ -11,11 +11,23 @@ var LinkPostSchema = PostSchema.extend({
   preview_photo_url: { type: String }
 });
 
-LinkPostSchema.statics.getPreviewPhotoUrl = function(url, done) {
-  var request = require('request')
-    , cheerio = require('cheerio');
+/* Ensure http protocol */
+var httpProtocolExp = new RegExp("^https?://*");
+var urlWithProtocol = function(url){
+  return !httpProtocolExp.test(url) ? "http://"+url : url;
+};
+LinkPostSchema.pre('save', function(next){
+  var post = this;
+  post.link = urlWithProtocol(post.link);
+  next();
+});
 
-  request(url, function(err, res, body){
+LinkPostSchema.statics.getPreviewPhotoUrl = function(url, done) {
+  var request    = require('request')
+    , cheerio    = require('cheerio')
+    , decodedUrl = decodeURIComponent(url);
+
+  request(decodedUrl, function(err, res, body){
     if (err) return done(err, null);
     $ = cheerio.load(body);
 
@@ -38,18 +50,6 @@ LinkPostSchema.statics.getPreviewPhotoUrl = function(url, done) {
     done(null, null);
   });
 };
-
-var httpProtocolExp = new RegExp("^http*");
-var urlWithProtocol = function(url){
-  return !httpProtocolExp.test(url) ? "http://"+url : url;
-};
-
-/* Ensure http protocol */
-LinkPostSchema.pre('save', function(next){
-  var post = this;
-  post.link = urlWithProtocol(post.link);
-  next();
-});
 
 LinkPostSchema.statics.updatePostPreviewPhotoUrl = function(post, done) {
   var Model = this;

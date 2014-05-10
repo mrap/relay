@@ -21,5 +21,6 @@ module.exports = function(app) {
   app.use('/partials' , require('./partials') )
   app.use('/posts'    , require('./posts') );
   app.use('/users'    , require('./users') );
+  app.use('/utils'    , require('./utils') );
 
 };

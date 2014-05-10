@@ -38,8 +38,8 @@ router.post('/', function(req, res){
     if (err) throw err;
     res.json(post);
 
-    // Update the link_posts preview_photo_url
-    if (Model === LinkPost) {
+    // Update the link_posts preview_photo_url if it doesn't yet have one
+    if (Model === LinkPost && !post.preview_photo_url) {
       Model.updatePostPreviewPhotoUrl(post, function(err){
         if (err) throw err;
       });
