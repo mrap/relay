@@ -2,7 +2,9 @@
   .row.inner-topbar
     .col-sm-3.header(ng-switch='isUserLoggedIn')
       div(ng-switch-when='true')
-        .username {{ currentUser.username }}
+        img.img-circle.avatar(ng-src='{{ currentUser.avatar.small.defaultUrl }}')
+        .info
+          .username(ng-bind='currentUser.username')
       div(ng-switch-default)
         | Start by relaying posts you like
         p.small
