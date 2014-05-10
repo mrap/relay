@@ -1,3 +1,5 @@
+@import "./vars";
+
 .feed {
   position: relative;
   margin-top: 20px;
@@ -45,7 +47,6 @@ $post-body-bg: #ECF0F1;
   background: $post-body-bg;
 
   .post-body-content {
-    margin-top: 10px;
   }
 
   .created {
@@ -62,7 +63,7 @@ $post-body-bg: #ECF0F1;
 
   .relayer {
     position: absolute;
-    left: -110px;
+    left: -115px;
     top: -20px;
     z-index: 10;
 
@@ -81,13 +82,11 @@ $post-body-bg: #ECF0F1;
     .avatar {
       display: inline-block;
       vertical-align: middle;
+      width: 42px;
+      height: 42px;
+      background: black; // inner border color
+      padding: 0px;     // inner border width
+      border: 4px solid $main-bg;
     }
-  }
-
-  .avatar {
-    width: 42px;
-    height: 42px;
-    border: 4px solid $post-body-bg;
-    background-color: gray;
   }
 }
