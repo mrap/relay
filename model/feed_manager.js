@@ -236,9 +236,10 @@ var FeedManager = {
 
       // Build multi transaction to get the hash for all feedItems
       var commands = [];
-      for(var i = idsAndScores.length-1; i >=0; i -= 2) {
-        var pid    = idsAndScores[i-1]
-          , score = idsAndScores[i];
+      var length = idsAndScores.length
+      for(var i = 0; i < length; i += 2) {
+        var pid    = idsAndScores[i]
+          , score = idsAndScores[i+1];
 
         feedItems[pid] = { score: score };
         var args = ['HGETALL', self.userFeedItemKey(user, pid)];
@@ -249,7 +250,7 @@ var FeedManager = {
         if (err) return done(err, null);
 
         // Assign each reply to its feedItem
-        for(var j = idsAndScores.length-2; j >= 0; j -= 2) {
+        for(var j = 0; j < length; j += 2) {
           var pid   = idsAndScores[j]
             , reply = replies[Math.floor(j/2)];
           feedItems[pid] = new FeedItem({
