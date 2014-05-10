@@ -58,9 +58,9 @@ describe("User Requests", function(){
         });
       });
 
-      it("should return posts sorted by score (greatest to smallest)", function(){
+      it("should return posts sorted by score (smallest to greatest)", function(){
         for(var i = 1; i < body.length; i++) {
-          expect(body[i].feedItem.score).to.be.at.most(body[i-1].feedItem.score);
+          expect(body[i].feedItem.score).to.be.at.least(body[i-1].feedItem.score);
         }
       });
     });
