@@ -99,7 +99,8 @@ describe("User Requests", function(){
       expect(body.email).to.eq(userAttrs.email);
     });
 
-    describe("then update avatar img", function(){
+    // Skip because it actually saves to s3
+    describe.skip("then update avatar img", function(){
       beforeEach(function(done){
         agent
           .post('/users/'+userID+'/avatar')
@@ -112,11 +113,10 @@ describe("User Requests", function(){
           });
       });
 
-      // Skip because it actually saves to s3
-      it.skip("should have uploaded the avatar", function(done){
+      it("should have uploaded the avatar", function(done){
         User.findOne({username: userAttrs.username}, function(err, res){
-          console.log(res.avatar_medium_img);
-          expect(res.avatar_medium_img).to.exist;
+          expect(res.avatar.small.defaultUrl).to.exist;
+          expect(res.avatar.medium.defaultUrl).to.exist;
           done();
         });
       });

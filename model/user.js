@@ -81,15 +81,14 @@ userSchema.plugin(attachments, {
         medium: {
           resize: '150x150',
           '$format': 'jpg'
+        },
+        small: {
+          resize: '75x75',
+          '$format': 'jpg'
         }
       }
     }
   }
-});
-
-/*** Url to attachments ***/
-userSchema.virtual('avatar_medium_img').get(function(){
-  return config.s3.baseUrl+"/users/"+this._id+"-medium.jpg";
 });
 
 /**
