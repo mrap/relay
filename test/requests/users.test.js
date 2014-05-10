@@ -115,8 +115,9 @@ describe("User Requests", function(){
 
       it("should have uploaded the avatar", function(done){
         User.findOne({username: userAttrs.username}, function(err, res){
-          expect(res.avatar.small.defaultUrl).to.exist;
           expect(res.avatar.medium.defaultUrl).to.exist;
+          expect(res.avatar.small.defaultUrl).to.exist;
+          expect(res.avatar.tiny.defaultUrl).to.exist;
           done();
         });
       });

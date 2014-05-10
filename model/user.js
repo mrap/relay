@@ -85,6 +85,10 @@ userSchema.plugin(attachments, {
         small: {
           resize: '75x75',
           '$format': 'jpg'
+        },
+        tiny: {
+          resize: '42x42',
+          '$format': 'jpg'
         }
       }
     }

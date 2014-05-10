@@ -44,7 +44,7 @@ postSchema.virtual('feedItem').get(function(){
 });
 
 postSchema.virtual('relayer').get(function(){
-  return this.__temp_relayer || null;
+  return this.__temp_relayer || this._last_relayed_by || null;
 }).set(function(v){
   this.__temp_relayer = v;
 });

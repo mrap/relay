@@ -4,11 +4,13 @@
     .post-photo-preview(ng-if='post.preview_photo_url')
       img(ng-src='{{ post.preview_photo_url }}')
     .post-body
-      p.created
-        | Post created {{ post.relay_count }} connections away
-      .headline
-        | {{ post.headline }}
-        | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
+      img.img-circle.relayer-avatar(ng-src="{{ post.relayer.avatar.small.defaultUrl }}")
+      .post-body-content
+        p.created
+          | Post created {{ post.relay_count }} connections away
+        .headline
+          | {{ post.headline }}
+          | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
 
     // .post-controls
     //   button.btn.btn-primary(type="button" ng-model="post.relayed" ng-click="toggleRelayPost(post)" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false")
