@@ -1,6 +1,6 @@
 // First 'post' is always the user's avatar
 .feed
-  .post.fx-fade-left.fx-easing-bounce(post-hide ng-repeat='post in posts' ng-class="{'show-post': !shouldHide}")
+  .post.fx-fade-left(post-hide ng-repeat='post in posts' ng-class="{'show-post': !shouldHide}")
     .post-photo-preview(ng-if='post.preview_photo_url')
       img(ng-src='{{ post.preview_photo_url }}')
     .post-body
