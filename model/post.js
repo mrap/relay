@@ -43,6 +43,12 @@ postSchema.virtual('feedItem').get(function(){
   this.__tempFeedItem = v;
 });
 
+postSchema.virtual('relayer').get(function(){
+  return this.__temp_relayer || null;
+}).set(function(v){
+  this.__temp_relayer = v;
+});
+
 /***** Static Model Methods *****/
 postSchema.statics.createByUser = function(attrs, user, callback){
   /*** Save Post ***/

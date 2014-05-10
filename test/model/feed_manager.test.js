@@ -57,6 +57,15 @@ describe("Feed Manager", function(){
           done();
         });
       });
+
+      it("should include post relayer", function(done){
+        FeedManager.getUserFeedPosts(connectedUserID, function(err, posts){
+          if (err) return done(err);
+          var first = posts[0];
+          expect(first.relayer).to.exist;
+          done();
+        });
+      });
     });
 
     describe("#getUserFeedItem", function(){

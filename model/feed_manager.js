@@ -129,31 +129,31 @@ var FeedManager = {
 
   /**
    * Gets user's feed.
-   * Valid options are: IDS_ONLY
    */
-  getUserFeedPosts: function(user, callback, options){
+  getUserFeedPosts: function(user, callback){
     var self = this;
-    var key = this.userFeedKey(user);
-    options = options || {};
-    this.getFeedPostIDsForKey(key, function(err, postIDs){
+    self.getUserFeedItems(user, function(err, feedItems){
       if (err) return callback(err, null);
-      if (options.IDS_ONLY) return callback(null, postIDs);
 
+      var postIDs = Object.keys(feedItems);
       var Post = require('mongoose').model('Post');
       // Get posts from MongoDB
       Post.findByIds(postIDs, null, function(err, dbPosts){
         if (err) return callback(err, null);
 
-        // Assign each post.feedItem
-        function assignFeedItem(itr){
-          if (itr === dbPosts.length) return callback(null, dbPosts.sort(self.dbPostsCompareFn));
-          self.getUserFeedItem(user, dbPosts[itr], function(err, feedItem){
-            if (err) return callback(err, null);
-            dbPosts[itr].feedItem = feedItem;
-            assignFeedItem(itr+1);
-          });
-        }
-        assignFeedItem(0);
+        // Get all senders (user objects)
+        self.getAllFeedItemSenders(feedItems, function(err, senders){
+          if (err) return callback(err, null);
+
+          // Assign each post.feedItem and complete relayer (user obj)
+          for(var i = dbPosts.length-1; i >= 0; i--){
+            var pid = dbPosts[i].id
+              , item = feedItems[pid];
+            dbPosts[i].feedItem = item;
+            dbPosts[i].relayer  = senders[item.senderID.toString()];
+          }
+          return callback(null, dbPosts.sort(self.dbPostsCompareFn));
+        });
       });
     });
   },
@@ -161,6 +161,32 @@ var FeedManager = {
   // Sort by feedItem score, lowest to highest
   dbPostsCompareFn: function(a, b){
     return a.feedItem.score - b.feedItem.score;
+  },
+
+  // Get an associative array of feedItem senders
+  getAllFeedItemSenders: function(feedItems, done){
+    // Get sender Ids
+    var senderIDs = [];
+    if (feedItems instanceof Array)
+      feedItems.forEach(function(item){ senderIDs.push(item.senderID); });
+    else {
+      for(var prop in feedItems) {
+        var item = feedItems[prop];
+        if (!item instanceof FeedItem) continue;
+        senderIDs.push(item.senderID);
+      }
+    }
+
+    // Grab all users from MongoDB
+    var User = require('mongoose').model('User');
+    User.find( {'_id': {'$in': senderIDs} }, function(err, users){
+      if (err) done(err, null);
+
+      // Construct associative array with users
+      var senders = {};
+      users.forEach(function(user){ senders[user.id] = user; });
+      done(null, senders);
+    });
   },
 
   /**
@@ -187,10 +213,58 @@ var FeedManager = {
     });
   },
 
-  getFeedPostIDsForKey: function(key, callback){
+  // Available options: WITHSCORES
+  getUserFeedPostIDs: function(user, done, options){
+    options = options || {};
+    var args = [this.userFeedKey(user), 0, -1];
+    if (options.WITHSCORES) args.push('WITHSCORES');
+    client.zrange(args, done);
+  },
+
+  /**
+   * Returns a associative array of feedItems
+   * Index is the postId
+   */
+  getUserFeedItems: function(user, done){
     var self = this;
-    var args = [key, 0, -1];
-    client.zrange(args, callback);
+
+    var feedItems = {};
+    // Get PostIDs with scores
+    // result => [id, score, id, ...]
+    this.getUserFeedPostIDs(user, function(err, idsAndScores){
+      if (err) return done(err, null);
+
+      // Build multi transaction to get the hash for all feedItems
+      var commands = [];
+      for(var i = idsAndScores.length-1; i >=0; i -= 2) {
+        var pid    = idsAndScores[i-1]
+          , score = idsAndScores[i];
+
+        feedItems[pid] = { score: score };
+        var args = ['HGETALL', self.userFeedItemKey(user, pid)];
+        commands.push(args);
+      }
+
+      client.multi(commands).exec(function(err, replies){
+        if (err) return done(err, null);
+
+        // Assign each reply to its feedItem
+        for(var j = idsAndScores.length-2; j >= 0; j -= 2) {
+          var pid   = idsAndScores[j]
+            , reply = replies[Math.floor(j/2)];
+          feedItems[pid] = new FeedItem({
+            postID         : pid,
+            relayed        : reply.relayed,
+            senderID       : reply.sender,
+            prevSenderID   : reply.prevSender,
+            originDistance : reply.origin_dist,
+            score          : feedItems[pid].score
+          });
+        }
+
+        done(null, feedItems);
+      });
+    }, {WITHSCORES: true});
   },
 
   getUserFeedItem: function(userID, postID, callback){
