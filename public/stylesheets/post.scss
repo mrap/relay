@@ -47,6 +47,7 @@ $post-body-bg: #ECF0F1;
   background: $post-body-bg;
 
   .post-body-content {
+    word-wrap: break-word;
   }
 
   .created {
