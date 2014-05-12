@@ -2,18 +2,35 @@
 
 .topbar {
   position: fixed;
-  top: $top-padding;
   height: $topbar-height;
+  top: $top-padding;
   width: 100%;
   z-index: 1000;
-  background-color: black;
-  background-color: rgba(0,0,0,0.8);
   color: white;
-  display: table;
+
+  #brand {
+    position: relative;
+    left: 40px;
+    font-family: "Proxima Nova", "Helvetica", sans-serif;
+    font-weight: 700;
+    font-size: 4em;
+    color: black;
+    color: rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .inner-topbar-wrapper {
+    width: 100%;
+    display: table;
+  }
 
   .inner-topbar {
+    background-color: black;
+    background-color: rgba(0,0,0,0.8);
     display: table-cell;
     vertical-align: middle;
+    padding-top: $topbar-inner-padding/2;
+    padding-bottom: $topbar-inner-padding/2;
   }
 
   .header {

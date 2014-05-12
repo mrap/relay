@@ -1,4 +1,8 @@
 $main-bg: #333233;
 $topbar-height: 80px;
 $top-padding: 100px;
-$topbar-bottom: $topbar-height+$top-padding;
+@media (max-width: 768px) {
+  $top-padding: 20px;
+}
+$topbar-inner-padding: 20px;
+$topbar-bottom: $topbar-height+$top-padding+$topbar-inner-padding;
