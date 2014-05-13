@@ -41,14 +41,20 @@ router.post('/', function(req, res){
 
   Model.createByUser(postAttrs, authorID, function(err, post){
     if (err) throw err;
-    res.json(post);
 
-    // Update the link_posts preview_photo_url if it doesn't yet have one
-    if (Model === LinkPost && !post.preview_photo_url) {
-      Model.updatePostPreviewPhotoUrl(post, function(err){
-        if (err) throw err;
-      });
-    }
+    // Set user as relayer
+    User.findById(authorID, function(err, user){
+      if (err) throw err;
+      post.relayer = user;
+      res.json(post);
+
+      // Update the link_posts preview_photo_url if it doesn't yet have one
+      if (Model === LinkPost && !post.preview_photo_url) {
+        Model.updatePostPreviewPhotoUrl(post, function(err){
+          if (err) throw err;
+        });
+      }
+    });
   });
 });
 
@@ -64,6 +70,7 @@ router.post('/:id/relay', function(req, res){
     if (!user) throw new Error("User with id:%s does not exist!", relayerID);
     user.relayOtherPost(req.params.id, function(err, post){
       if (err) throw err;
+      console.log(post);
       res.json(post);
     });
   });

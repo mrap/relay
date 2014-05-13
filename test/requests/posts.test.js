@@ -52,6 +52,10 @@ describe("Post Requests", function(){
         done();
       });
     });
+
+    it("should include the relayer", function(){
+      expect(body.relayer.username).to.eq(user.username);
+    });
   });
 
   describe("POST / (creating a new link_post)", function(){

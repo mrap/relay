@@ -4,8 +4,8 @@ var directives = angular.module('relay.directives', []);
 
 directives
   .directive('newPostForm',
-             ['Restangular', '$window', '$document', 'Post', 'urlValidator', 'urlImageExtractor',
-             function(Restangular, $window, $document, Post, urlValidator, urlImageExtractor){
+             ['Restangular', '$window', '$document', 'Post', 'urlValidator', 'urlImageExtractor', '$rootScope',
+             function(Restangular, $window, $document, Post, urlValidator, urlImageExtractor, $rootScope){
     return function(scope, element, attr) {
       /* Simply scrolls to the top for now */
       var scrollToNewPost = function(duration){
@@ -44,6 +44,7 @@ directives
 
       var updatePendingPost = function(entry){
         scope.posts[0].headline  = entry;
+        scope.posts[0].relayer   = $rootScope.currentUser;
         if (urlValidator.isUrl(entry)) {
           scope.posts[0].post_type = 'link_post';
           scope.posts[0].link      = entry;
