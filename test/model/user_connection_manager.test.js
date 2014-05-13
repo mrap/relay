@@ -2,7 +2,7 @@
 
 describe("UserConnectionManager", function(){
 
-  describe.only("#getDiffBetweenStoredConnections", function(){
+  describe("#getDiffBetweenStoredConnections", function(){
     var dist           = 10
       , user1          = null
       , user2          = null
