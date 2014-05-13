@@ -19,6 +19,11 @@ router.post('/login',
                                   })
 );
 
+router.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
 router.get('/login', function(req, res){
   res.render('users/login', { flash: req.flash() });
 });

@@ -5,6 +5,8 @@ html(ng-app="relay")
     meta(content='width=device-width, initial-scale=1.0' name='viewport')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller="AppController")
+    #logout(ng-if='isUserLoggedIn')
+      a(ng-href='/logout') Logout
     .container-fluid(ng-controller="HomeFeedController")
       include includes/topbar
       .row
