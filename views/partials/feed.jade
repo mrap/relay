@@ -24,10 +24,10 @@
             | {{ post.headline }}
             | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
 
-        .controls
-          a(ng-href='#' ng-click='toggleRelayPostAtIndex($index)' ng-hide='post.feedStatus() === "relayed"') RELAY
-
     .post-bottom
-      .row.post-feed-status(ng-show='post.feedStatus()' ng-switch='post.feedStatus()')
-        .post-feed-status.relayed(ng-switch-when='relayed') Relayed
+      .controls
+        a.btn.relay-btn(ng-href='#' ng-click='toggleRelayPostAtIndex($index)' ng-hide='post.feedStatus() === "relayed"') RELAY
+
+      .post-feed-status(ng-show='post.feedStatus()' ng-switch='post.feedStatus()')
+        .relayed(ng-switch-when='relayed') Relayed
         

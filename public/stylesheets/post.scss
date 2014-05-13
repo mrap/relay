@@ -97,17 +97,22 @@ $post-body-bg: #ECF0F1;
 }
 
 .post-bottom {
+  background: black;
 }
 
 .post-feed-status {
-  height: 40px;
   font-family: "Source Sans Pro", Helvetica, sans-serif;
   font-weight: 700;
   font-size: 1.2em;
   color: white;
-  background: black;
+  text-transform: uppercase;
 
   .relayed {
     background: #50E3C2;
+    padding: 5px;
   }
+}
+
+.relay-btn {
+  color: #50E3C2;
 }
