@@ -2,7 +2,8 @@
 .feed
   .post.fx-fade-left(post-hide ng-repeat='post in posts' ng-class="{'show-post': !shouldHide}")
     .post-photo-preview(ng-if='post.preview_photo_url')
-      img(ng-src='{{ post.preview_photo_url }}')
+      a(ng-href='{{ post.link }}' target='_blank')
+        img(ng-src='{{ post.preview_photo_url }}')
     .post-body
       .relayer
         .info
@@ -13,8 +14,12 @@
         p.created
           | Post created {{ post.relay_count }} connections away
         .headline
-          | {{ post.headline }}
-          | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
+          a(ng-if='post.link' ng-href='{{ post.link }}' target='_blank')
+            | {{ post.headline }}
+            | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
+          div(ng-if='!post.link')
+            | {{ post.headline }}
+            | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
 
     // .post-controls
     //   button.btn.btn-primary(type="button" ng-model="post.relayed" ng-click="toggleRelayPost(post)" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false")
