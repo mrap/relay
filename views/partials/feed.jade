@@ -20,8 +20,5 @@
           div(ng-if='!post.link')
             | {{ post.headline }}
             | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
-
-    // .post-controls
-    //   button.btn.btn-primary(type="button" ng-model="post.relayed" ng-click="toggleRelayPost(post)" btn-checkbox btn-checkbox-true="true" btn-checkbox-false="false")
-    //     | {{ post.relayed ? "Un-relay" : "Relay" }}
-
+        .controls
+          a(ng-href='#' ng-click='toggleRelayPost(post)' ng-hide='post.feedItem.relayed') RELAY
