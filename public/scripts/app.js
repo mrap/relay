@@ -20,12 +20,12 @@ app.config(['RestangularProvider', function(RestangularProvider){
 
 app.run(['Restangular', 'Post', 'User', function(Restangular, Post, User){
   Restangular.extendModel('posts', function(model){
-    angular.extend(model, Post);
-    return model;
+    var post = new Post(model);
+    return post;
   });
   Restangular.extendModel('feed', function(model){
-    angular.extend(model, Post);
-    return model;
+    var post = new Post(model);
+    return post;
   });
 }]);
 

@@ -63,10 +63,14 @@ factories.factory('postManager', ['$rootScope', 'Restangular', function($rootSco
 factories.factory('Post', function(){
 
   function Post(data){
-    angular.extend(this, data);
     data = data || {};
+    angular.extend(this, data);
     this.feedItem = data.feedItem || {};
     this.relayed  = this.feedItem.relayed || data.relayed || false;
+    this.feedStatus = function() {
+      if (this.relayed) return 'relayed';
+      else return null;
+    };
   }
 
   return Post;

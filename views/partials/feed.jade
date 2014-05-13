@@ -1,15 +1,18 @@
 // First 'post' is always the user's avatar
 .feed
+
   .post.fx-fade-left(post-hide ng-repeat='post in posts' ng-class="{'show-post': !shouldHide}")
     .post-photo-preview(ng-if='post.preview_photo_url')
       a(ng-href='{{ post.link }}' target='_blank')
         img(ng-src='{{ post.preview_photo_url }}')
+
     .post-body
       .relayer
         .info
           .username(ng-bind='post.relayer.username')
           .action relayed
         img.img-circle.avatar(ng-src="{{ post.relayer.avatar.small.defaultUrl }}")
+
       .post-body-content
         p.created
           | Post created {{ post.relay_count }} connections away
@@ -20,5 +23,11 @@
           div(ng-if='!post.link')
             | {{ post.headline }}
             | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
+
         .controls
-          a(ng-href='#' ng-click='toggleRelayPost(post)' ng-hide='post.feedItem.relayed') RELAY
+          a(ng-href='#' ng-click='toggleRelayPostAtIndex($index)' ng-hide='post.feedStatus() === "relayed"') RELAY
+
+    .post-bottom
+      .row.post-feed-status(ng-show='post.feedStatus()' ng-switch='post.feedStatus()')
+        .post-feed-status.relayed(ng-switch-when='relayed') Relayed
+        

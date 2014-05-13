@@ -13,7 +13,9 @@ controllers.controller('HomeFeedController', ['$rootScope', '$scope', 'feedManag
       else                            $scope.posts = feedManager.getUserFeed($rootScope.currentUser);
     }, true);
 
-    $scope.toggleRelayPost = function(post) {
+    $scope.toggleRelayPostAtIndex = function(index) {
+      var post = $scope.posts[index];
+      $scope.posts[index].relayed = !post.relayed;
       if (post.relayed) $rootScope.currentUser.unrelayPost(post);
       else              $rootScope.currentUser.relayPost(post);
     };
