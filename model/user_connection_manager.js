@@ -71,13 +71,63 @@ var UserConnectionManager = {
     });
   },
 
+  // returns [other_user_id, dist, ...]
+  getUserConnectionsFromRedis: function(user, done){
+    user = getObjectID(user);
+    var args = [this.userConnectionsKey(user), 0, -1, 'WITHSCORES'];
+    client.zrange(args, done);
+  },
+
+
+  /**
+   * Returns the difference between two redis sorted sets
+   * Only returns differences!
+   * If no difference, it will not be included in the resulting hash:
+   * { other_user_id: { isNewConnection: Bool, distanceDiff: Number }  }
+   */
+  getDiffBetweenStoredConnections: function(oldConns, newConns, done){
+    var oldHash   = {}
+      , oldLength = oldConns.length
+      , newLength = newConns.length;
+
+    // Create a hash for the old connections array
+    for(var i = 0; i < oldLength; i+=2){
+      var otherUserID = oldConns[i]
+        , score       = oldConns[i+1];
+      oldHash[otherUserID] = Number(score);
+    }
+
+    var diffHash  = { newConnections: {}, removedConnections: {}, existingConnections: {} };
+    for(var j = 0; j < newLength; j+=2){
+      var otherUserID = newConns[j]
+        , score       = Number( newConns[j+1] );
+
+      // New Connection
+      if (!oldHash[otherUserID]) diffHash.newConnections[otherUserID] = score;
+      // Existing Connection
+      else {
+        diffHash.existingConnections[otherUserID] = score - oldHash[otherUserID];
+        // After checking, delete the item from oldHash.
+        delete oldHash[otherUserID];
+      }
+    }
+
+    // All user_ids remaining in old hash are not in new connections
+    var userIDs = Object.keys(oldHash)
+      , length = userIDs.length;
+    for (var k = 0; k < length; k++) {
+      var otherUserID = userIDs[k];
+      diffHash.removedConnections[otherUserID] = oldHash[otherUserID];
+    }
+
+    done(null, diffHash);
+  },
+
   /**
    * Returns an array of user's connections.
    */
   getUserConnections: function(user, callback){
-    user = getObjectID(user);
-    var args = [this.userConnectionsKey(user), 0, -1, 'WITHSCORES'];
-    client.zrange(args, function(err, reply){
+    this.getUserConnectionsFromRedis(user, function(err, reply){
       if (err) return callback(err, null);
       var connections = new Array();
       var length      = reply.length;
