@@ -2,17 +2,12 @@
 .feed
 
   .post.fx-fade-left(post-hide ng-repeat='post in posts' ng-class="{'show-post': !shouldHide}")
+
     .post-photo-preview(ng-if='post.preview_photo_url')
       a(ng-href='{{ post.link }}' target='_blank')
         img(ng-src='{{ post.preview_photo_url }}')
 
     .post-body
-      .relayer
-        .info
-          .username(ng-bind='post.relayer.username')
-          .action relayed
-        img.img-circle.avatar(ng-src="{{ post.relayer.avatar_img_url }}")
-
       .post-body-content
         p.created
           | Post created {{ post.relay_count }} connections away
@@ -24,10 +19,27 @@
             | {{ post.headline }}
             | ({{ post.is_media ? "MEDIA" : "PLAIN" }})
 
-    .post-bottom
-      .controls
-        a.btn.relay-btn(ng-href='#' ng-click='toggleRelayPostAtIndex($index)' ng-hide='post.feedStatus() === "relayed"') RELAY
+    // Post Info Bar
+    .row.post-info-bar(ng-class='post.feedStatus()')
 
-      .post-feed-status(ng-show='post.feedStatus()' ng-switch='post.feedStatus()')
-        .relayed(ng-switch-when='relayed') Relayed
-        
+      // Relayer
+      .col-xs-8.relayer(ng-switch='post.feedStatus()')
+        img.img-circle.avatar(ng-src="{{ post.feedStatus() ? post.relayer.avatar_img_url : 'https://feedfu.s3.amazonaws.com/ui/icons/lock.png' }}")
+        div.info(ng-switch-when='relayed')
+          span.username(ng-bind='post.relayer.username')
+          // span.action.active-action
+          //   |  relayed
+        div.info(ng-switch-default)
+          span.action React to reveal
+
+      // Less Button
+      a.col-xs-2.post-reaction.less-btn(ng-if='!post.feedStatus()' ng-href='#' ng-click='toggleRelayPostAtIndex($index)')
+        i.fa.fa-minus
+
+      // More Button
+      a.col-xs-2.post-reaction.more-btn(ng-if='!post.feedStatus()' ng-href='#' ng-click='toggleRelayPostAtIndex($index)')
+        i.fa.fa-plus
+
+      .col-xs-4(ng-if='post.feedStatus()')
+        .post-feed-status {{ post.feedStatus() }}
+

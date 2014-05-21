@@ -65,56 +65,85 @@ $post-body-bg: #ECF0F1;
       color: black;
     }
   }
+}
 
-  .relayer {
-    position: absolute;
-    left: -183px;
-    top: -20px;
-    z-index: 10;
-    width: 200px;
-    text-align: right;
+.react-prompt{
+  display: inline-block;
+  vertical-align: middle;
+  color: white;
+  font-size: 0.7em;
+}
 
-    .info {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 10px;
-      text-align: right;
 
-      .action {
-        color: lightgray;
-        font-size: 0.8em;
-      }
-    }
+.relayer {
+  top: -5px;
+  left: -40px;
+  z-index: 10;
 
-    .avatar {
-      display: inline-block;
-      vertical-align: middle;
-      width: 42px;
-      height: 42px;
-      background: black; // inner border color
-      padding: 0px;     // inner border width
-      border: 4px solid $main-bg;
-    }
+
+  .avatar {
+    display: inline-block;
+    vertical-align: middle;
+    width: 42px;
+    height: 42px;
+    background: black; // inner border color
+    padding: 0px;     // inner border width
+    border: 4px solid $main-bg;
   }
 }
 
-.post-bottom {
+.info {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  text-align: left;
+
+  .username {
+    color: black;
+  }
+
+  .action {
+    color: darkgray;
+  }
+
+  .action.active-action {
+    color: black;
+  }
+}
+
+
+.post-info-bar {
+  margin: 0 auto;
+  height: 30px;
   background: black;
+}
+
+.relayed {
+  background: #50E3C2;
+}
+
+.post-reaction {
+  height: 100%;
+  color: black;
+  padding: 5px;
+  text-align: center;
+}
+
+.less-btn {
+  background: #7F8C8D;
+}
+
+.more-btn{
+  background: #16A085;
 }
 
 .post-feed-status {
   font-family: "Source Sans Pro", Helvetica, sans-serif;
   font-weight: 700;
-  font-size: 1.2em;
   color: white;
   text-transform: uppercase;
-
-  .relayed {
-    background: #50E3C2;
-    padding: 5px;
-  }
+  display: inline-block;
+  vertical-align: middle;
+  padding: 5px;
 }
 
-.relay-btn {
-  color: #50E3C2;
-}
