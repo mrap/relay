@@ -1,11 +1,14 @@
 var mongoose    = require('mongoose')
   , PostFixture = require('./posts.fixture')
-  , Factory     = require('../factories');
+  , Factory     = require('../factories')
+  , Faker       = require('Faker');
 
 // Each connected user will be x distance away from base user. (performs in descending order)
 // Each connected user will post exactly once.
 module.exports.UserWithConnectionsAndFeed = function(userAttrs, connectionsCount, next){
   /*** Setup ***/
+  userAttrs = userAttrs || {};
+  userAttrs.username = userAttrs.username || Faker.Internet.userName();
   Factory.create('User', userAttrs, function(err, user){
     if (err) return next(err, null, null);
 
@@ -19,7 +22,8 @@ module.exports.UserWithConnectionsAndFeed = function(userAttrs, connectionsCount
       if (current === 0) return next(null, user, extra);
 
       // Create the other user
-      Factory.create('User', function(err, other){
+      var username = Faker.Internet.userName();
+      Factory.create('User', {username: username}, function(err, other){
         if (err) return next(err, null, null);
         // Connect with base user
         user.connectWithUser(current, other, function(err, connection){

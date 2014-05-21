@@ -64,6 +64,10 @@ userSchema.virtual('needsEncryption').get(function(){
   }
 });
 
+userSchema.virtual('avatar_img_url').get(function(){
+  return this.avatar.small.defaultUrl || require('Faker').Image.avatar();
+});
+
 /*** Attachments ***/
 userSchema.plugin(attachments, {
   directory: 'users',
