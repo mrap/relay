@@ -68,9 +68,11 @@ $post-body-bg: #ECF0F1;
 
   .relayer {
     position: absolute;
-    left: -115px;
+    left: -183px;
     top: -20px;
     z-index: 10;
+    width: 200px;
+    text-align: right;
 
     .info {
       display: inline-block;
