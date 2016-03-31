@@ -6,6 +6,7 @@
     "start": "nodemon --debug ./bin/www",
     "test": "NODE_ENV=test mocha -w"
   },
+  "engine": "node >= 0.10.43",
   "dependencies": {
     "Faker": "^0.7.2",
     "bcrypt": "~0.7.7",
@@ -24,7 +25,7 @@
     "mocha": "~1.18.2",
     "mocha-mongoose": "~1.0.1",
     "mongodb": "~1.4.0",
-    "mongoose": "~3.8.8",
+    "mongoose": "~4.0.0",
     "mongoose-attachments": "~0.0.4",
     "mongoose-schema-extend": "~0.1.7",
     "morgan": "~1.0.0",
@@ -39,6 +40,6 @@
   "devDependencies": {
     "monky": "~0.3.1",
     "supertest": "^0.12.0",
-    "zombie": "~2.0.0-alpha31"
+    "zombie": "~2.0.0"
   }
 }

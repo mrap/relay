@@ -22,7 +22,7 @@ describe("Post Model", function(){
     })
 
     it("should have an _author reference", function(){
-      post._author.toString().should.eq(user._id.toString());
+      eqObjectIDs(post._author, user).should.be.true;
     });
 
     it("should be saved to the author's posts", function(done){
