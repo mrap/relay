@@ -70,7 +70,6 @@ router.post('/:id/relay', function(req, res){
     if (!user) throw new Error("User with id:%s does not exist!", relayerID);
     user.relayOtherPost(req.params.id, function(err, post){
       if (err) throw err;
-      console.log(post);
       res.json(post);
     });
   });
