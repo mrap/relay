@@ -13,7 +13,7 @@ db.once('open', function(){
   if (config.env == 'development' && process.env.SEED_DB){
     config.SEED_DB = false;
     console.log("seedDB");
-    require('../config/seed_db');
+    require('../config/seed_db')();
   }
 });
 

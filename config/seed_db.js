@@ -27,4 +27,4 @@ var seedDB = function(){
   });
 };
 
-module.exports = seedDB();
+module.exports = seedDB;
